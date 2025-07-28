@@ -1,0 +1,343 @@
+.interaction-checker {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.interaction-header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 10px;
+}
+
+.interaction-header h2 {
+  margin: 0 0 10px 0;
+  font-size: 2.5rem;
+}
+
+.interaction-header p {
+  margin: 0;
+  font-size: 1.1rem;
+  opacity: 0.9;
+}
+
+.interaction-disclaimer {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+  color: white;
+  padding: 15px 20px;
+  border-radius: 10px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.interaction-disclaimer p {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.interaction-disclaimer strong {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.interaction-controls {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.family-member-section {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.family-member-section h3 {
+  margin: 0 0 15px 0;
+  color: #333;
+}
+
+.family-member-select {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  font-size: 16px;
+  background: white;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+
+.family-member-select:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.search-section, .refresh-section {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.search-section h3 {
+  margin: 0 0 15px 0;
+  color: #333;
+}
+
+.search-box {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.search-box input {
+  flex: 1;
+  padding: 12px 15px;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+}
+
+.search-box input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.search-box button {
+  padding: 12px 20px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.search-box button:hover:not(:disabled) {
+  background: #5a6fd8;
+}
+
+.search-box button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.search-results {
+  margin-top: 15px;
+}
+
+.search-results h4 {
+  margin: 0 0 10px 0;
+  color: #333;
+}
+
+.drug-list {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #e1e5e9;
+  border-radius: 8px;
+}
+
+.drug-item {
+  padding: 12px 15px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.drug-item:hover {
+  background: #f8f9fa;
+}
+
+.drug-item:last-child {
+  border-bottom: none;
+}
+
+.drug-item strong {
+  display: block;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.drug-item span {
+  color: #666;
+  font-size: 14px;
+}
+
+.refresh-section button {
+  width: 100%;
+  padding: 15px;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.refresh-section button:hover:not(:disabled) {
+  background: #218838;
+}
+
+.refresh-section button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.error-message {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border: 1px solid #f5c6cb;
+}
+
+.safety-message {
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-weight: 500;
+  font-size: 16px;
+  text-align: center;
+}
+
+.safety-message.safe {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.safety-message.warning {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.interactions-section {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+.interactions-section h3 {
+  margin: 0 0 20px 0;
+  color: #333;
+}
+
+.loading, .no-interactions {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  font-size: 18px;
+}
+
+.no-interactions {
+  color: #28a745;
+  font-weight: 500;
+}
+
+.interactions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.interaction-item {
+  background: #f8f9fa;
+  border-left: 4px solid #6c757d;
+  padding: 20px;
+  border-radius: 8px;
+  transition: transform 0.2s;
+}
+
+.interaction-item:hover {
+  transform: translateX(5px);
+}
+
+.interaction-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.severity {
+  font-weight: bold;
+  font-size: 14px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: rgba(0,0,0,0.1);
+}
+
+.family-member {
+  font-weight: 500;
+  color: #333;
+}
+
+.interaction-drugs, .interaction-description, .interaction-recommendation {
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.interaction-drugs strong, .interaction-description strong, .interaction-recommendation strong {
+  color: #333;
+}
+
+.interaction-info {
+  background: #e3f2fd;
+  padding: 20px;
+  border-radius: 10px;
+  border-left: 4px solid #2196f3;
+}
+
+.interaction-info h4 {
+  margin: 0 0 15px 0;
+  color: #1976d2;
+}
+
+.interaction-info ul {
+  margin: 0 0 15px 0;
+  padding-left: 20px;
+}
+
+.interaction-info li {
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.interaction-info p {
+  margin: 0;
+  font-style: italic;
+  color: #666;
+}
+
+@media (max-width: 768px) {
+  .interaction-controls {
+    grid-template-columns: 1fr;
+  }
+  
+  .search-box {
+    flex-direction: column;
+  }
+  
+  .interaction-header h2 {
+    font-size: 2rem;
+  }
+} 

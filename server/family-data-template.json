@@ -1,0 +1,59 @@
+{
+  "familyMembers": [
+    {
+      "name": "John Doe",
+      "age": 35,
+      "allergies": ["Penicillin", "Sulfa"],
+      "conditions": ["Hypertension", "Diabetes"],
+      "emergencyContact": "Jane Doe",
+      "emergencyPhone": "+1234567890",
+      "role": "admin",
+      "medications": [
+        {
+          "drugName": "Metformin 500mg",
+          "dosage": "1 tablet",
+          "frequency": "Twice daily",
+          "notes": "Take with food",
+          "cost": 65.00
+        },
+        {
+          "drugName": "Amlodipine 5mg",
+          "dosage": "1 tablet",
+          "frequency": "Once daily",
+          "notes": "Take in morning",
+          "cost": 78.00
+        }
+      ]
+    },
+    {
+      "name": "Jane Doe",
+      "age": 32,
+      "allergies": ["None"],
+      "conditions": ["Asthma"],
+      "emergencyContact": "John Doe",
+      "emergencyPhone": "+1234567890",
+      "role": "member",
+      "medications": [
+        {
+          "drugName": "Paracetamol 500mg",
+          "dosage": "1 tablet",
+          "frequency": "As needed",
+          "notes": "For headache",
+          "cost": 35.00
+        }
+      ]
+    }
+  ],
+  "customDrugs": [
+    {
+      "name": "Custom Medication",
+      "category": "Custom Category",
+      "strength": "10mg",
+      "dosageForm": "Tablet",
+      "manufacturer": "Generic",
+      "price": 25.00,
+      "sideEffects": ["Drowsiness"],
+      "alternatives": ["Alternative 1", "Alternative 2"]
+    }
+  ]
+} 
