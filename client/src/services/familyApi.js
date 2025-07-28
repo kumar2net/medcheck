@@ -1,6 +1,6 @@
 const API_BASE_URL = process.env.NODE_ENV === 'production' 
   ? '/api'  // Use relative URL for production (Netlify)
-  : '/api';  // Use relative URL for development too
+  : 'http://localhost:3001/api';  // Point to Express server for development
 
 class FamilyApiService {
   async request(endpoint, options = {}) {
