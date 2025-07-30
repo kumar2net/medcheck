@@ -1,35 +1,23 @@
 {
-  "name": "drug-suggestion-app-root",
+  "name": "drugreco-mvp",
   "version": "1.0.0",
   "private": true,
+  "description": "DrugReco MVP - Drug Recommendation and Family Management App",
   "scripts": {
-    "start": "NODE_ENV=production node server/index.js",
-    "start:prod": "NODE_ENV=production node server/index.js",
-    "dev": "NODE_ENV=development node index.js",
-    "build": "npm run build:client && npm run build:functions",
-    "build:client": "npm install --prefix client && npm run build --prefix client",
-    "build:functions": "npm install --prefix netlify/functions && npx prisma generate --schema=server/prisma/schema.prisma",
-    "install:all": "npm install && npm install --prefix client",
-    "postinstall": "prisma generate --schema=server/prisma/schema.prisma"
-  },
-  "dependencies": {
-    "@prisma/client": "^6.11.1",
-    "bcryptjs": "^2.4.3",
-    "cors": "^2.8.5",
-    "dotenv": "^16.6.0",
-    "express": "^4.21.2",
-    "express-rate-limit": "^7.1.5",
-    "express-slow-down": "^2.0.1",
-    "helmet": "^7.1.0",
-    "jsonwebtoken": "^9.0.2",
-    "node-fetch": "^2.7.0",
-    "pg": "^8.16.2",
-    "serverless-http": "^3.2.0"
+    "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
+    "server:dev": "cd server && npm run dev",
+    "client:dev": "cd client && npm start",
+    "build": "cd client && npm run build",
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install"
   },
   "devDependencies": {
-    "prisma": "^6.11.1"
+    "concurrently": "^8.0.0"
   },
-  "engines": {
-    "node": "18.x"
-  }
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/drugreco-mvp.git"
+  },
+  "keywords": ["drug-recommendation", "family-health", "medication-management", "mvp"],
+  "author": "Your Name",
+  "license": "MIT"
 }

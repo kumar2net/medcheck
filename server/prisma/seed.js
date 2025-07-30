@@ -65,11 +65,17 @@ async function main() {
   let upserted = 0;
   for (const drug of drugs) {
     try {
-      await prisma.drug.upsert({
-        where: { name: drug.name },
-        update: drug,
-        create: drug
-      });
+          const drugData = {
+      ...drug,
+      sideEffects: JSON.stringify(drug.sideEffects),
+      alternatives: JSON.stringify(drug.alternatives)
+    };
+    
+    await prisma.drug.upsert({
+      where: { name: drug.name },
+      update: drugData,
+      create: drugData
+    });
       console.log(`✅ Upserted: ${drug.name}`);
       upserted++;
     } catch (err) {

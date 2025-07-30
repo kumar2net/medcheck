@@ -1,280 +1,243 @@
-# 🏥 DrugReco - Family Medication Management System
+# 🏥 DrugReco MVP - Drug Recommendation & Family Health Management
 
-**Date:** 2025-07-28  
-**Status:** ✅ Production Ready - Netlify Migration Complete  
-**Architecture:** Serverless (Netlify + Neon Database)
+A comprehensive web application for managing family medications, checking drug interactions, and discovering drug alternatives.
 
----
+## 🚀 Features
 
-## 🎯 **Project Overview**
+### Core MVP Features
+- **🔍 Drug Search** - Search and discover medications with detailed information
+- **👨‍👩‍👧‍👦 Family Management** - Add and manage family members' health profiles
+- **💊 Medication Tracking** - Track medications for each family member
+- **⚠️ Interaction Checking** - Check for potential drug interactions
+- **🔄 Alternative Suggestions** - Discover alternative medications
+- **📊 Health Dashboard** - Overview of family medication status
 
-DrugReco is a comprehensive family medication management system that helps families track medications, check drug interactions, and manage healthcare information securely. The application has been fully migrated from Express.js to a modern serverless architecture using Netlify and Neon database.
+### Technical Features
+- **Real-time Search** - Fast drug search with autocomplete
+- **Responsive Design** - Works on desktop and mobile devices
+- **Data Persistence** - PostgreSQL database for reliable data storage
+- **RESTful API** - Clean API architecture for frontend-backend communication
 
-## ⚡ **Live Demo & Deployment**
+## 🛠️ Technology Stack
 
-- **Frontend**: Ready for Netlify deployment
-- **API**: Serverless functions on Netlify
-- **Database**: Neon PostgreSQL (serverless)
-- **Local Testing**: Full development environment available
+### Frontend
+- **React 18** - Modern React with hooks and functional components
+- **CSS3** - Custom styling with responsive design
+- **Fetch API** - HTTP client for API communication
 
-## 🏗️ **Architecture**
+### Backend
+- **Node.js** - JavaScript runtime
+- **Express.js** - Web application framework
+- **Prisma ORM** - Database toolkit and ORM
+- **PostgreSQL** - Relational database
+- **JWT** - Authentication tokens
+- **Helmet** - Security middleware
 
-### **Modern Serverless Stack**
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   React Frontend│    │ Netlify Functions│    │  Neon Database  │
-│   (Netlify CDN) │◄──►│   (Serverless)  │◄──►│  (PostgreSQL)   │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-```
+### Development Tools
+- **React Scripts** - Create React App toolchain
+- **Nodemon** - Development server with hot reload
+- **Concurrently** - Run multiple scripts simultaneously
 
-### **Technology Stack**
-- **Frontend**: React 18+, CSS Modules, Responsive Design
-- **Backend**: Netlify Serverless Functions, Express.js middleware
-- **Database**: Neon PostgreSQL with Prisma ORM
-- **Authentication**: JWT tokens with secure session management
-- **Security**: Rate limiting, CORS, Content Security Policy
-- **Deployment**: Netlify with automated builds
+## 📦 Installation & Setup
 
-## 🚀 **Features**
+### Prerequisites
+- Node.js (v18 or higher)
+- PostgreSQL (v17 recommended)
+- npm or yarn package manager
 
-### **Core Functionality**
-- ✅ **Family Medication Tracking** - Manage medications for multiple family members
-- ✅ **Drug Interaction Checking** - Real-time safety analysis
-- ✅ **Search & Discovery** - Comprehensive drug database with alternatives
-- ✅ **User Authentication** - Secure JWT-based login system
-- ✅ **Responsive Design** - Works on desktop, tablet, and mobile
-- ✅ **Real-time Updates** - Live data synchronization
-
-### **Advanced Features**
-- 🔒 **Security Hardened** - Zero critical vulnerabilities
-- 📊 **Performance Optimized** - Sub-second response times
-- 🎨 **Modern UI/UX** - Clean, intuitive interface
-- 📱 **Mobile Ready** - Progressive Web App capabilities
-- 🔍 **Smart Search** - Intelligent drug name matching
-- 📈 **Analytics Ready** - Built-in logging and metrics
-
-## 📁 **Project Structure**
-
-```
-drugreco/
-├── client/                    # React Frontend Application
-│   ├── src/
-│   │   ├── components/       # Reusable UI components
-│   │   ├── services/         # API communication layer
-│   │   └── hooks/           # Custom React hooks
-│   └── build/               # Production build output
-├── server/                   # Original Express Server (Reference)
-│   ├── index.js             # Main server file
-│   ├── prisma/              # Database schema and migrations
-│   └── services/            # Business logic services
-├── netlify/                 # Netlify Serverless Functions
-│   ├── functions/           # Serverless API endpoints
-│   ├── env.example          # Environment variable template
-│   └── .env.local           # Local development config
-├── scripts/                 # Deployment and setup scripts
-│   └── setup-neon-db.sh    # Database initialization
-├── docs/                    # Documentation
-│   ├── PRD.md              # Product Requirements
-│   ├── DEPLOYMENT_GUIDE.md # Deployment instructions
-│   ├── MIGRATION_SUMMARY.md # Migration details
-│   └── LOCAL_TESTING.md    # Development guide
-└── netlify.toml            # Netlify configuration
-```
-
-## 🛠️ **Quick Start**
-
-### **Prerequisites**
-- Node.js 18+ 
-- PostgreSQL 17+ (for local development)
-- Netlify CLI (`npm install -g netlify-cli`)
-
-### **Local Development Setup**
-
-1. **Clone and Install**
-   ```bash
-   git clone https://github.com/kumar2net/drugreco.git
-   cd drugreco
-   npm install
-   ```
-
-2. **Environment Setup**
-   ```bash
-   # Run the setup script
-   ./setup-env.sh
-   
-   # Or manually copy environment files
-   cp netlify/env.example netlify/.env.local
-   cp server/env.example server/.env.local
-   ```
-
-3. **Database Setup**
-   ```bash
-   # Start PostgreSQL service
-   brew services start postgresql@17
-   
-   # Create database
-   createdb drugreco_dev
-   
-   # Run migrations and seed
-   cd server && npx prisma db push && node seed.js
-   ```
-
-4. **Start Development Servers**
-   ```bash
-   # Terminal 1: Frontend (React)
-   cd client && npm start
-   
-   # Terminal 2: Backend API (Express)
-   cd server && npm start
-   
-   # Terminal 3: Netlify Functions (Testing)
-   netlify dev --port 8888
-   
-   # Terminal 4: Database Management
-   npx prisma studio --schema=server/prisma/schema.prisma --port 5555
-   ```
-
-5. **Access Applications**
-   - **Frontend**: [http://localhost:3000](http://localhost:3000)
-   - **API**: [http://localhost:3001](http://localhost:3001)
-   - **Netlify Functions**: [http://localhost:8888](http://localhost:8888)
-   - **Database Studio**: [http://localhost:5555](http://localhost:5555)
-
-## 🚀 **Production Deployment**
-
-### **Deploy to Netlify**
-
-1. **Create Neon Database**
-   - Sign up at [neon.tech](https://neon.tech)
-   - Create project and get connection strings
-   - Note down `DATABASE_URL` and `DIRECT_URL`
-
-2. **Deploy to Netlify**
-   ```bash
-   # Build application
-   npm run build
-   
-   # Deploy using script
-   ./deploy-netlify.sh
-   
-   # Or manual deployment
-   netlify deploy --prod --dir=client/build
-   ```
-
-3. **Configure Environment Variables**
-   - Go to Netlify dashboard → Site settings → Environment variables
-   - Add all variables from `netlify/env.example`
-   - Set `DATABASE_URL` and `DIRECT_URL` to your Neon strings
-
-4. **Setup Database**
-   ```bash
-   # Run database setup
-   ./scripts/setup-neon-db.sh
-   ```
-
-### **Post-Deployment**
-- ✅ Verify all API endpoints work
-- ✅ Test family management features
-- ✅ Confirm drug interaction checking
-- ✅ Validate authentication flow
-- ✅ Test mobile responsiveness
-
-## 📊 **Performance Metrics**
-
-| Metric | Value | Status |
-|--------|--------|--------|
-| **Build Time** | ~1-2 minutes | ✅ Optimized |
-| **Bundle Size** | 52.81 kB | ✅ Lightweight |
-| **API Response** | <200ms | ✅ Fast |
-| **Database Queries** | <50ms | ✅ Efficient |
-| **Security Score** | 0 vulnerabilities (backend) | ✅ Secure |
-| **Lighthouse Score** | 90+ (estimated) | ✅ High Performance |
-
-## 🔒 **Security Features**
-
-- **JWT Authentication** - Secure token-based auth
-- **Rate Limiting** - Protection against abuse
-- **CORS Configuration** - Cross-origin security
-- **Input Validation** - SQL injection prevention  
-- **Content Security Policy** - XSS protection
-- **HTTPS Enforcement** - Encrypted connections
-- **Environment Variables** - Secure config management
-
-## 🧪 **Testing**
-
-### **Automated Testing**
+### 1. Clone Repository
 ```bash
-# Run all tests
-npm test
-
-# Test individual services
-./test-all-services.sh
-./test-local.sh
+git clone https://github.com/your-username/drugreco-mvp.git
+cd drugreco-mvp
 ```
 
-### **Manual Testing Checklist**
-- [ ] User registration and login
-- [ ] Family member management
-- [ ] Medication tracking
-- [ ] Drug interaction checking
-- [ ] Search functionality
-- [ ] Mobile responsiveness
-- [ ] Performance under load
+### 2. Install Dependencies
+```bash
+npm run install:all
+```
 
-## 📖 **Documentation**
+### 3. Database Setup
+```bash
+# Start PostgreSQL service (macOS with Homebrew)
+brew services start postgresql@17
 
-### **For Developers**
-- 📋 [**PRD.md**](PRD.md) - Product Requirements Document
-- 🚀 [**DEPLOYMENT_GUIDE.md**](DEPLOYMENT_GUIDE.md) - Complete deployment instructions
-- 🔄 [**MIGRATION_SUMMARY.md**](MIGRATION_SUMMARY.md) - Netlify migration details
-- 🧪 [**LOCAL_TESTING.md**](LOCAL_TESTING.md) - Local development guide
-- ✅ [**TODO.md**](TODO.md) - Task tracking and completion status
+# Create database
+createdb drugreco_dev
 
-### **For Operations**
-- 🔍 [**AUDIT_SUMMARY.md**](AUDIT_SUMMARY.md) - Security and cleanup audit
-- 🧹 [**CLEANUP_SUMMARY.md**](CLEANUP_SUMMARY.md) - Codebase optimization details
-- 🎯 [**FINAL_STATUS.md**](FINAL_STATUS.md) - Project completion summary
+# Set up environment variables
+cp server/.env.example server/.env
+# Edit server/.env with your database configuration
+```
 
-## 🤝 **Contributing**
+### 4. Database Migration & Seeding
+```bash
+cd server
+npm run db:migrate
+npm run db:seed
+```
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+### 5. Start Development Servers
+```bash
+# From root directory
+npm run dev
+```
 
-### **Development Guidelines**
-- Follow existing code style and conventions
-- Add tests for new features
-- Update documentation as needed
-- Ensure all services pass local testing
-- Verify security and performance impacts
+This will start both the frontend (http://localhost:3000) and backend (http://localhost:3001) servers.
 
-## 📝 **License**
+## 🔧 Environment Configuration
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+### Server Environment Variables (`server/.env`)
+```env
+# Database
+DATABASE_URL="postgresql://username:password@localhost:5432/drugreco_dev"
 
-## 🆘 **Support**
+# Server Configuration
+PORT=3001
+NODE_ENV=development
 
-- **Issues**: [GitHub Issues](https://github.com/kumar2net/drugreco/issues)
-- **Documentation**: See `/docs` folder for detailed guides
-- **Local Testing**: Use `./test-all-services.sh` for diagnostics
+# Security
+JWT_SECRET=your-secret-key-here
+BCRYPT_ROUNDS=10
 
-## 🎉 **Project Status**
+# Feature Flags
+ENABLE_AUTHENTICATION=true
+ENABLE_RATE_LIMITING=false
+ENABLE_LOGGING=true
+YOLO_MODE=true
+```
 
-**✅ MIGRATION COMPLETED** - The DrugReco application has been successfully migrated from Express.js to Netlify serverless architecture with:
+## 🏗️ Project Structure
 
-- ✅ Zero critical vulnerabilities
-- ✅ Modern serverless architecture
-- ✅ Comprehensive documentation
-- ✅ Production-ready deployment
-- ✅ Clean, maintainable codebase
-- ✅ Full feature preservation
+```
+drugreco-mvp/
+├── client/                 # React frontend application
+│   ├── public/            # Static assets
+│   ├── src/
+│   │   ├── components/    # React components
+│   │   ├── hooks/         # Custom React hooks
+│   │   └── services/      # API service layer
+│   └── package.json
+├── server/                # Express backend application
+│   ├── config/           # Configuration files
+│   ├── lib/              # Shared libraries
+│   ├── logs/             # Application logs
+│   ├── prisma/           # Database schema and migrations
+│   ├── services/         # Business logic services
+│   └── package.json
+├── package.json          # Root package configuration
+├── README.md
+└── TODO.md
+```
 
-**Ready for live deployment and real-world usage!**
+## 🧪 Testing the Application
+
+### Basic Testing Flow
+1. **Start the application** - `npm run dev`
+2. **Open browser** - Navigate to http://localhost:3000
+3. **Search for drugs** - Try searching "Startglim" or "Dapa"
+4. **Add family member** - Create a family member profile
+5. **Add medications** - Add medications to family member
+6. **Check interactions** - Use the interaction checker
+
+### API Testing
+```bash
+# Test drug search
+curl "http://localhost:3001/api/search?query=Dapa"
+
+# Test family members
+curl "http://localhost:3001/api/family-members"
+
+# Test health endpoint
+curl "http://localhost:3001/api/health"
+```
+
+## 📊 Database Schema
+
+### Core Models
+- **Drug** - Medication information (name, category, price, side effects)
+- **User** - User accounts and authentication
+- **FamilyMember** - Family member profiles
+- **FamilyMedication** - Medications assigned to family members
+
+### Key Relationships
+- Family members can have multiple medications
+- Each medication is linked to a drug in the drug database
+- Users can manage multiple family members
+
+## 🔐 Security Features
+
+- **Input Validation** - Sanitized user inputs
+- **Rate Limiting** - Prevents API abuse
+- **CORS Protection** - Secure cross-origin requests
+- **Helmet Security** - Security headers and protections
+- **JWT Authentication** - Secure user sessions
+
+## 🚀 Development Commands
+
+### Root Level
+```bash
+npm run dev                 # Start both frontend and backend
+npm run install:all        # Install all dependencies
+```
+
+### Frontend (client/)
+```bash
+npm start                  # Start React development server
+npm run build             # Build for production
+npm test                  # Run tests
+```
+
+### Backend (server/)
+```bash
+npm run dev               # Start with nodemon (auto-reload)
+npm start                 # Start production server
+npm run db:migrate        # Run database migrations
+npm run db:seed           # Seed database with sample data
+npm run db:reset          # Reset database and reseed
+```
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**Database Connection Error**
+```bash
+# Ensure PostgreSQL is running
+brew services start postgresql@17
+
+# Check database exists
+psql -l | grep drugreco_dev
+```
+
+**Port Already in Use**
+```bash
+# Kill process on port 3001
+lsof -ti:3001 | xargs kill -9
+```
+
+**Prisma Client Issues**
+```bash
+cd server
+npx prisma generate
+```
+
+## 🎯 Next Steps
+
+1. **Complete Testing** - Comprehensive testing of all features
+2. **Performance Optimization** - Database query optimization
+3. **Real Drug Data** - Integration with pharmaceutical APIs
+4. **Mobile Optimization** - Enhanced mobile experience
+5. **Authentication System** - User registration and login
+
+## 📞 Support
+
+For issues and questions:
+1. Check the troubleshooting section above
+2. Review the TODO.md for known issues
+3. Check application logs in `server/logs/`
 
 ---
 
-**Last Updated**: 2025-07-28  
-**Migration Status**: ✅ Complete  
-**Deployment Status**: 🚀 Ready for Production
+**Version:** 1.0.0  
+**Status:** MVP Ready for Testing  
+**Last Updated:** 2025-07-30

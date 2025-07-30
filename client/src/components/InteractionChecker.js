@@ -13,6 +13,7 @@ const InteractionChecker = () => {
   const [isSafe, setIsSafe] = useState(false);
   const [familyMembers, setFamilyMembers] = useState([]);
   const [selectedFamilyMember, setSelectedFamilyMember] = useState('');
+  const [checkMessage, setCheckMessage] = useState('');
 
   useEffect(() => {
     checkFamilyInteractions();
@@ -33,6 +34,7 @@ const InteractionChecker = () => {
       setLoading(true);
       const result = await familyApiService.checkFamilyInteractions();
       setInteractions(result.interactions || []);
+      setCheckMessage(result.detailMessage || '');
       setError(null);
     } catch (err) {
       setError('Failed to check family interactions: ' + err.message);
@@ -114,7 +116,7 @@ const InteractionChecker = () => {
             <option value="">Choose a family member...</option>
             {familyMembers.map((member) => (
               <option key={member.id} value={member.id}>
-                {member.name} ({member.age} years)
+                {member.name}
               </option>
             ))}
           </select>
@@ -173,6 +175,13 @@ const InteractionChecker = () => {
       {error && (
         <div className="error-message">
           ⚠️ {error}
+        </div>
+      )}
+
+      {checkMessage && (
+        <div className="check-details">
+          <h3>🔍 Interaction Check Details</h3>
+          <pre className="check-message">{checkMessage}</pre>
         </div>
       )}
 

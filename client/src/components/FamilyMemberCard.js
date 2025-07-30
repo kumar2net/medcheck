@@ -19,7 +19,6 @@ const FamilyMemberCard = ({ member, onEdit, onDelete, onManageMedications }) => 
         </div>
         <div className="member-info">
           <h3 className="member-name">{member.name}</h3>
-          {member.age && <p className="member-age">Age: {member.age}</p>}
           <span className={`member-role role-${member.role}`}>
             {member.role === 'admin' ? '👑 Admin' : 
              member.role === 'child' ? '🧒 Child' : '👤 Member'}

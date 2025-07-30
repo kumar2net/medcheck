@@ -14,16 +14,41 @@ class FamilyApiService {
     };
 
     try {
+      console.log(`[API] Making request to: ${url}`);
       const response = await fetch(url, config);
+      
+      // Enhanced error handling for 502 and other HTTP errors
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`[API] HTTP ${response.status} error:`, errorText);
+        
+        if (response.status === 502) {
+          throw new Error('Server is temporarily unavailable. Please check your database connection.');
+        } else if (response.status === 503) {
+          throw new Error('Database service is unavailable. Please try again later.');
+        } else if (response.status >= 500) {
+          throw new Error(`Server error (${response.status}). Please try again later.`);
+        } else {
+          throw new Error(`Request failed with status ${response.status}`);
+        }
+      }
+      
       const data = await response.json();
       
       if (!data.success) {
         throw new Error(data.message || 'API request failed');
       }
       
+      console.log(`[API] Request successful: ${endpoint}`);
       return data.data;
     } catch (error) {
-      console.error('API request failed:', error);
+      console.error(`[API] Request failed for ${endpoint}:`, error);
+      
+      // Network or fetch errors
+      if (error instanceof TypeError && error.message.includes('fetch')) {
+        throw new Error('Network error. Please check your internet connection.');
+      }
+      
       throw error;
     }
   }
