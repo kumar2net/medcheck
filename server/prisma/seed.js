@@ -59,6 +59,158 @@ async function main() {
         'Sugaflo',
         'Dapaford'
       ]
+    },
+    {
+      name: 'Sacurise',
+      category: 'Diabetes',
+      combination: 'Vildagliptin + Metformin',
+      strength: 'Vildagliptin 50 mg + Metformin 500 mg',
+      dosageForm: 'Tablet',
+      manufacturer: 'Novartis India Ltd',
+      price: 18.50,
+      sideEffects: [
+        'Nausea',
+        'Diarrhea',
+        'Upper respiratory tract infection',
+        'Headache',
+        'Dizziness',
+        'Vomiting',
+        'Hypoglycemia (when used with insulin or sulfonylureas)',
+        'Metallic taste',
+        'Stomach upset'
+      ],
+      alternatives: [
+        'Jalra M',
+        'Zomelis Met',
+        'Viglim M',
+        'Vildaray M',
+        'Dynaglipt M'
+      ]
+    },
+    {
+      name: 'Dolo 650',
+      category: 'Pain Relief',
+      combination: 'Paracetamol',
+      strength: 'Paracetamol 650 mg',
+      dosageForm: 'Tablet',
+      manufacturer: 'Micro Labs Ltd',
+      price: 2.50,
+      sideEffects: [
+        'Nausea',
+        'Vomiting',
+        'Stomach upset',
+        'Liver damage (with overdose)',
+        'Allergic reactions (rare)',
+        'Skin rash (rare)'
+      ],
+      alternatives: [
+        'Crocin 650',
+        'Calpol 650',
+        'Pacimol 650',
+        'Paracip 650',
+        'Tylenol'
+      ]
+    },
+    {
+      name: 'Azithral 500',
+      category: 'Antibiotics',
+      combination: 'Azithromycin',
+      strength: 'Azithromycin 500 mg',
+      dosageForm: 'Tablet',
+      manufacturer: 'Alembic Pharmaceuticals Ltd',
+      price: 12.00,
+      sideEffects: [
+        'Nausea',
+        'Vomiting',
+        'Diarrhea',
+        'Stomach pain',
+        'Headache',
+        'Dizziness',
+        'Hearing problems (rare)',
+        'Heart rhythm changes (rare)'
+      ],
+      alternatives: [
+        'Zithromax',
+        'Azimax',
+        'Azax',
+        'Zady',
+        'Azicip'
+      ]
+    },
+    {
+      name: 'Amlodac 5',
+      category: 'Hypertension',
+      combination: 'Amlodipine',
+      strength: 'Amlodipine 5 mg',
+      dosageForm: 'Tablet',
+      manufacturer: 'Cadila Healthcare Ltd',
+      price: 4.25,
+      sideEffects: [
+        'Ankle swelling',
+        'Fatigue',
+        'Dizziness',
+        'Flushing',
+        'Headache',
+        'Palpitations',
+        'Nausea',
+        'Abdominal pain'
+      ],
+      alternatives: [
+        'Amlong',
+        'Stamlo 5',
+        'Lupidip',
+        'Amlovas',
+        'Norvasc'
+      ]
+    },
+    {
+      name: 'Lipikind CV 20',
+      category: 'Cardiovascular',
+      combination: 'Atorvastatin + Clopidogrel',
+      strength: 'Atorvastatin 20 mg + Clopidogrel 75 mg',
+      dosageForm: 'Capsule',
+      manufacturer: 'Mankind Pharma Ltd',
+      price: 22.00,
+      sideEffects: [
+        'Muscle pain',
+        'Headache',
+        'Nausea',
+        'Diarrhea',
+        'Bleeding risk',
+        'Stomach upset',
+        'Dizziness',
+        'Liver enzyme elevation (rare)'
+      ],
+      alternatives: [
+        'Rosulip Plus',
+        'Ecosprin AV',
+        'Storvas CV',
+        'Atorlip CV',
+        'Lipitor Plus'
+      ]
+    },
+    {
+      name: 'Neurobion Forte',
+      category: 'Supplements',
+      combination: 'Vitamin B Complex',
+      strength: 'B1(10mg) + B6(3mg) + B12(15mcg)',
+      dosageForm: 'Tablet',
+      manufacturer: 'Merck Ltd',
+      price: 8.75,
+      sideEffects: [
+        'Mild stomach upset',
+        'Nausea',
+        'Allergic reactions (rare)',
+        'Flushing',
+        'Tingling sensation (rare)'
+      ],
+      alternatives: [
+        'Becosules',
+        'Supradyn',
+        'Nervijen Plus',
+        'Cobadex CZS',
+        'Vitcofol'
+      ]
     }
   ];
 

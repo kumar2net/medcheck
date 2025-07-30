@@ -134,10 +134,20 @@ drugreco-mvp/
 ### Basic Testing Flow
 1. **Start the application** - `npm run dev`
 2. **Open browser** - Navigate to http://localhost:3000
-3. **Search for drugs** - Try searching "Startglim" or "Dapa"
+3. **Search for drugs** - Try searching "Sacurise", "Dolo", "Startglim", or "Dapa"
 4. **Add family member** - Create a family member profile
-5. **Add medications** - Add medications to family member
+5. **Add medications** - Add medications to family member (8 drugs available)
 6. **Check interactions** - Use the interaction checker
+
+### Available Test Medications
+- **Sacurise** (Diabetes) - Vildagliptin + Metformin
+- **Dolo 650** (Pain Relief) - Paracetamol
+- **Azithral 500** (Antibiotics) - Azithromycin
+- **Amlodac 5** (Hypertension) - Amlodipine
+- **Lipikind CV 20** (Cardiovascular) - Atorvastatin + Clopidogrel
+- **Neurobion Forte** (Supplements) - Vitamin B Complex
+- **Startglim M2** (Diabetes) - Glimepiride + Metformin
+- **Dapa 10 mg** (Diabetes) - Dapagliflozin
 
 ### API Testing
 ```bash
