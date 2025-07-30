@@ -267,6 +267,34 @@ async function main() {
         'Bisocard 2.5',
         'Nebilong 2.5'
       ]
+    },
+    {
+      name: 'Dytor Plus 5',
+      category: 'Diuretics',
+      combination: 'Torsemide + Spironolactone',
+      strength: 'Torsemide 5 mg + Spironolactone 50 mg',
+      dosageForm: 'Tablet',
+      manufacturer: 'Cipla Ltd',
+      price: 12.75,
+      sideEffects: [
+        'Dizziness',
+        'Headache',
+        'Nausea',
+        'Dehydration',
+        'Low blood pressure',
+        'Electrolyte imbalance',
+        'Kidney function changes',
+        'Increased urination',
+        'Fatigue',
+        'Muscle cramps'
+      ],
+      alternatives: [
+        'Tor Plus',
+        'Dytor 20 Plus',
+        'Torsid Plus',
+        'Dynapress Plus',
+        'Torsinex Plus'
+      ]
     }
   ];
 

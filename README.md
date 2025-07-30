@@ -134,13 +134,14 @@ drugreco-mvp/
 ### Basic Testing Flow
 1. **Start the application** - `npm run dev`
 2. **Open browser** - Navigate to http://localhost:3000
-3. **Search for drugs** - Try searching "Sacurise", "Bisolong", "Dolo", "Startglim", or "Dapa"
+3. **Search for drugs** - Try searching "Sacurise", "Dytor", "Bisolong", "Dolo", "Startglim", or "Dapa"
 4. **Add family member** - Create a family member profile
-5. **Add medications** - Add medications to family member (10 drugs available)
+5. **Add medications** - Add medications to family member (11 drugs available)
 6. **Check interactions** - Use the interaction checker
 
 ### Available Test Medications
 - **Sacurise** (Diabetes) - Vildagliptin + Metformin
+- **Dytor Plus 5** (Diuretics) - Torsemide + Spironolactone
 - **Bisolong 2.5** (Hypertension) - Bisoprolol Fumarate 2.5mg
 - **Bisolong 5** (Hypertension) - Bisoprolol Fumarate 5mg
 - **Dolo 650** (Pain Relief) - Paracetamol

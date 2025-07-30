@@ -26,6 +26,9 @@ The DrugReco MVP comes pre-loaded with 8 common medications across different cat
 ### 💊 **Supplements**
 - **Neurobion Forte** - Vitamin B Complex (Merck Ltd)
 
+### 💧 **Diuretics**
+- **Dytor Plus 5** - Torsemide + Spironolactone (Cipla Ltd)
+
 ## How to Add Medications
 
 ### 1. **Search and Select Method** (Current)
