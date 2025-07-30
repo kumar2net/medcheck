@@ -239,6 +239,34 @@ async function main() {
         'Bisocar',
         'Cardivas'
       ]
+    },
+    {
+      name: 'Bisolong 2.5',
+      category: 'Hypertension',
+      combination: 'Bisoprolol Fumarate',
+      strength: 'Bisoprolol 2.5 mg',
+      dosageForm: 'Tablet',
+      manufacturer: 'Micro Labs Ltd',
+      price: 4.25,
+      sideEffects: [
+        'Fatigue',
+        'Dizziness',
+        'Headache',
+        'Cold hands and feet',
+        'Nausea',
+        'Diarrhea',
+        'Slow heart rate',
+        'Low blood pressure',
+        'Sleep disturbances',
+        'Depression (rare)'
+      ],
+      alternatives: [
+        'Concor 2.5',
+        'Corbis 2.5',
+        'Bisoheart 2.5',
+        'Bisocard 2.5',
+        'Nebilong 2.5'
+      ]
     }
   ];
 
