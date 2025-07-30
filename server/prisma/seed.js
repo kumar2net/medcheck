@@ -164,6 +164,32 @@ async function main() {
       ]
     },
     {
+      name: 'Lipikind CV 10',
+      category: 'Cardiovascular',
+      combination: 'Atorvastatin + Clopidogrel',
+      strength: 'Atorvastatin 10 mg + Clopidogrel 75 mg',
+      dosageForm: 'Capsule',
+      manufacturer: 'Mankind Pharma Ltd',
+      price: 18.00,
+      sideEffects: [
+        'Muscle pain',
+        'Headache',
+        'Nausea',
+        'Diarrhea',
+        'Bleeding risk',
+        'Stomach upset',
+        'Dizziness',
+        'Liver enzyme elevation (rare)'
+      ],
+      alternatives: [
+        'Rosulip Plus',
+        'Ecosprin AV',
+        'Storvas CV',
+        'Atorlip CV',
+        'Lipitor Plus'
+      ]
+    },
+    {
       name: 'Lipikind CV 20',
       category: 'Cardiovascular',
       combination: 'Atorvastatin + Clopidogrel',

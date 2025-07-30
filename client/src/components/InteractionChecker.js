@@ -146,7 +146,24 @@ const InteractionChecker = () => {
       Object.entries(familyMemberMedications).forEach(([memberName, medications]) => {
         message += `👤 *${memberName}:*\n`;
         medications.forEach(med => {
-          message += `  • ${med.drugName} (${med.dosage} ${med.frequency})\n`;
+          // Extract key strength info for cleaner display
+          let strengthDisplay = '';
+          if (med.strength) {
+            // For combination drugs, show simplified strength
+            if (med.strength.includes('+')) {
+              // Extract main component strengths for combination drugs
+              const parts = med.strength.split('+').map(part => {
+                const match = part.trim().match(/(\d+(?:\.\d+)?)\s*(mg|mcg|ml|IU)/i);
+                return match ? `${match[1]}${match[2]}` : part.trim();
+              });
+              strengthDisplay = ` (${parts.join(' + ')})`;
+            } else {
+              // For single drugs, extract just the dose
+              const match = med.strength.match(/(\d+(?:\.\d+)?)\s*(mg|mcg|ml|IU)/i);
+              strengthDisplay = match ? ` (${match[1]}${match[2]})` : '';
+            }
+          }
+          message += `  • ${med.drugName}${strengthDisplay} - ${med.dosage} ${med.frequency}\n`;
         });
         message += `\n`;
       });
