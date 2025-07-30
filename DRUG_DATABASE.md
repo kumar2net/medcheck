@@ -17,6 +17,7 @@ The DrugReco MVP comes pre-loaded with 8 common medications across different cat
 
 ### ❤️ **Hypertension**
 - **Amlodac 5** - Amlodipine (Cadila Healthcare)
+- **Bisolong 5** - Bisoprolol Fumarate (Micro Labs)
 
 ### 🫀 **Cardiovascular**
 - **Lipikind CV 20** - Atorvastatin + Clopidogrel (Mankind Pharma)

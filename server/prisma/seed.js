@@ -211,6 +211,34 @@ async function main() {
         'Cobadex CZS',
         'Vitcofol'
       ]
+    },
+    {
+      name: 'Bisolong 5',
+      category: 'Hypertension',
+      combination: 'Bisoprolol Fumarate',
+      strength: 'Bisoprolol 5 mg',
+      dosageForm: 'Tablet',
+      manufacturer: 'Micro Labs Ltd',
+      price: 6.75,
+      sideEffects: [
+        'Fatigue',
+        'Dizziness',
+        'Headache',
+        'Cold hands and feet',
+        'Nausea',
+        'Diarrhea',
+        'Slow heart rate',
+        'Low blood pressure',
+        'Sleep disturbances',
+        'Depression (rare)'
+      ],
+      alternatives: [
+        'Concor 5',
+        'Corbis 5',
+        'Bisoprol',
+        'Bisocar',
+        'Cardivas'
+      ]
     }
   ];
 
