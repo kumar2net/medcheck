@@ -764,45 +764,162 @@ app.post('/api/interactions/family-check', async (req, res, next) => {
     });
     
     const interactions = [];
+    const testedCombinations = [];
+    const familyMemberMedications = {};
+    
+    // Group medications by family member for better reporting
+    allMedications.forEach(med => {
+      if (!familyMemberMedications[med.familyMember.name]) {
+        familyMemberMedications[med.familyMember.name] = [];
+      }
+      familyMemberMedications[med.familyMember.name].push({
+        drugName: med.drug.name,
+        drugId: med.drugId,
+        category: med.drug.category,
+        strength: med.drug.strength,
+        dosage: med.dosage,
+        frequency: med.frequency
+      });
+    });
+    
+    // Enhanced high-risk combinations with more details
     const highRiskCombinations = [
-      ['Aspirin', 'Ibuprofen'],
-      ['Metformin', 'Alcohol'],
-      ['Amlodipine', 'Simvastatin']
+      {
+        drugs: ['Aspirin', 'Ibuprofen'],
+        severity: 'high',
+        riskType: 'Increased bleeding risk',
+        description: 'Both medications can increase bleeding risk when taken together',
+        recommendation: 'Avoid concurrent use. Consider alternative pain relief methods or consult healthcare provider',
+        mechanism: 'Both inhibit platelet aggregation'
+      },
+      {
+        drugs: ['Metformin', 'Alcohol'],
+        severity: 'moderate',
+        riskType: 'Lactic acidosis risk',
+        description: 'Alcohol can increase the risk of lactic acidosis with Metformin',
+        recommendation: 'Limit alcohol consumption. Monitor for symptoms of lactic acidosis',
+        mechanism: 'Alcohol interferes with lactate metabolism'
+      },
+      {
+        drugs: ['Amlodipine', 'Simvastatin'],
+        severity: 'moderate',
+        riskType: 'Muscle toxicity',
+        description: 'Amlodipine can increase Simvastatin levels, leading to muscle problems',
+        recommendation: 'Monitor for muscle pain, weakness, or tenderness. Consider dose adjustment',
+        mechanism: 'Amlodipine inhibits CYP3A4 enzyme that metabolizes Simvastatin'
+      },
+      {
+        drugs: ['Bisoprolol', 'Verapamil'],
+        severity: 'high',
+        riskType: 'Cardiovascular effects',
+        description: 'Combination can cause dangerous drop in heart rate and blood pressure',
+        recommendation: 'Avoid combination or use with extreme caution under medical supervision',
+        mechanism: 'Additive negative chronotropic and inotropic effects'
+      },
+      {
+        drugs: ['Torsemide', 'Digoxin'],
+        severity: 'moderate',
+        riskType: 'Electrolyte imbalance',
+        description: 'Diuretics can increase Digoxin toxicity due to potassium loss',
+        recommendation: 'Monitor potassium levels and Digoxin levels regularly',
+        mechanism: 'Hypokalemia increases Digoxin sensitivity'
+      }
     ];
     
+    // Test all possible drug combinations
     for (let i = 0; i < drugs.length; i++) {
       for (let j = i + 1; j < drugs.length; j++) {
         const drug1 = drugs[i];
         const drug2 = drugs[j];
         
-        const hasInteraction = highRiskCombinations.some(combo => 
-          (drug1.name.includes(combo[0]) && drug2.name.includes(combo[1])) ||
-          (drug1.name.includes(combo[1]) && drug2.name.includes(combo[0]))
+        // Find which family members are taking these drugs
+        const members1 = allMedications.filter(med => med.drugId === drug1.id).map(med => ({
+          name: med.familyMember.name,
+          dosage: med.dosage,
+          frequency: med.frequency
+        }));
+        const members2 = allMedications.filter(med => med.drugId === drug2.id).map(med => ({
+          name: med.familyMember.name,
+          dosage: med.dosage,
+          frequency: med.frequency
+        }));
+        
+        // Check for interactions
+        const interactionInfo = highRiskCombinations.find(combo => 
+          (drug1.name.toLowerCase().includes(combo.drugs[0].toLowerCase()) && 
+           drug2.name.toLowerCase().includes(combo.drugs[1].toLowerCase())) ||
+          (drug1.name.toLowerCase().includes(combo.drugs[1].toLowerCase()) && 
+           drug2.name.toLowerCase().includes(combo.drugs[0].toLowerCase())) ||
+          (drug1.combination && drug1.combination.toLowerCase().includes(combo.drugs[0].toLowerCase()) && 
+           drug2.name.toLowerCase().includes(combo.drugs[1].toLowerCase())) ||
+          (drug1.name.toLowerCase().includes(combo.drugs[0].toLowerCase()) && 
+           drug2.combination && drug2.combination.toLowerCase().includes(combo.drugs[1].toLowerCase()))
         );
         
-        if (hasInteraction) {
-          // Find which family members are taking these drugs
-          const members1 = allMedications.filter(med => med.drugId === drug1.id).map(med => med.familyMember.name);
-          const members2 = allMedications.filter(med => med.drugId === drug2.id).map(med => med.familyMember.name);
+        const combinationResult = {
+          drug1: {
+            name: drug1.name,
+            category: drug1.category,
+            strength: drug1.strength,
+            takenBy: members1
+          },
+          drug2: {
+            name: drug2.name,
+            category: drug2.category,
+            strength: drug2.strength,
+            takenBy: members2
+          },
+          hasInteraction: !!interactionInfo,
+          tested: true
+        };
+        
+        if (interactionInfo) {
+          const affectedMembers = [...new Set([...members1.map(m => m.name), ...members2.map(m => m.name)])];
           
           interactions.push({
-            severity: 'high',
+            severity: interactionInfo.severity,
+            riskType: interactionInfo.riskType,
             drug1: drug1.name,
             drug2: drug2.name,
-            description: `Family interaction: ${drug1.name} and ${drug2.name}`,
-            affectedMembers: [...new Set([...members1, ...members2])],
-            recommendation: 'Review medications with healthcare provider'
+            description: interactionInfo.description,
+            mechanism: interactionInfo.mechanism,
+            recommendation: interactionInfo.recommendation,
+            affectedMembers,
+            memberDetails: {
+              drug1Users: members1,
+              drug2Users: members2
+            }
           });
+          
+          combinationResult.interactionDetails = interactionInfo;
         }
+        
+        testedCombinations.push(combinationResult);
       }
     }
     
+    // Create detailed summary
+    const summary = {
+      totalCombinationsTested: testedCombinations.length,
+      interactionsFound: interactions.length,
+      safeCombinationCount: testedCombinations.length - interactions.length,
+      severityBreakdown: {
+        high: interactions.filter(i => i.severity === 'high').length,
+        moderate: interactions.filter(i => i.severity === 'moderate').length,
+        low: interactions.filter(i => i.severity === 'low').length
+      }
+    };
+    
     res.json(createResponse(true, { 
       interactions, 
+      testedCombinations,
+      familyMemberMedications,
+      summary,
       totalMedications: allMedications.length,
       uniqueDrugs: uniqueDrugIds.length,
-      familyMembers: [...new Set(allMedications.map(med => med.familyMember.name))]
-    }, 'Family interaction check completed'));
+      familyMembers: [...new Set(allMedications.map(med => med.familyMember.name))],
+      detailMessage: `Tested ${testedCombinations.length} drug combinations across ${Object.keys(familyMemberMedications).length} family members. Found ${interactions.length} potential interactions.`
+    }, 'Comprehensive family interaction check completed'));
   } catch (err) {
     next(err);
   }

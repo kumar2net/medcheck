@@ -14,6 +14,10 @@ const InteractionChecker = () => {
   const [familyMembers, setFamilyMembers] = useState([]);
   const [selectedFamilyMember, setSelectedFamilyMember] = useState('');
   const [checkMessage, setCheckMessage] = useState('');
+  const [testedCombinations, setTestedCombinations] = useState([]);
+  const [familyMemberMedications, setFamilyMemberMedications] = useState({});
+  const [summary, setSummary] = useState(null);
+  const [showDetailedResults, setShowDetailedResults] = useState(false);
 
   useEffect(() => {
     checkFamilyInteractions();
@@ -34,6 +38,9 @@ const InteractionChecker = () => {
       setLoading(true);
       const result = await familyApiService.checkFamilyInteractions();
       setInteractions(result.interactions || []);
+      setTestedCombinations(result.testedCombinations || []);
+      setFamilyMemberMedications(result.familyMemberMedications || {});
+      setSummary(result.summary || null);
       setCheckMessage(result.detailMessage || '');
       setError(null);
     } catch (err) {
@@ -212,16 +219,23 @@ const InteractionChecker = () => {
                   <span className="severity" style={{ color: getSeverityColor(interaction.severity) }}>
                     {interaction.severity?.toUpperCase() || 'UNKNOWN'}
                   </span>
-                  <span className="family-member">{interaction.familyMember}</span>
+                  <span className="risk-type">{interaction.riskType}</span>
+                  <span className="affected-members">👥 {interaction.affectedMembers?.join(', ')}</span>
                 </div>
                 
                 <div className="interaction-drugs">
-                  <strong>Drugs:</strong> {interaction.drugs?.join(' + ') || 'Unknown'}
+                  <strong>Drugs:</strong> {interaction.drug1} + {interaction.drug2}
                 </div>
                 
                 {interaction.description && (
                   <div className="interaction-description">
                     <strong>Description:</strong> {interaction.description}
+                  </div>
+                )}
+
+                {interaction.mechanism && (
+                  <div className="interaction-mechanism">
+                    <strong>Mechanism:</strong> {interaction.mechanism}
                   </div>
                 )}
                 
@@ -230,11 +244,138 @@ const InteractionChecker = () => {
                     <strong>Recommendation:</strong> {interaction.recommendation}
                   </div>
                 )}
+
+                {interaction.memberDetails && (
+                  <div className="member-details">
+                    <div className="drug-users">
+                      <strong>{interaction.drug1} users:</strong> 
+                      {interaction.memberDetails.drug1Users.map(user => 
+                        ` ${user.name} (${user.dosage} ${user.frequency})`
+                      ).join(', ')}
+                    </div>
+                    <div className="drug-users">
+                      <strong>{interaction.drug2} users:</strong> 
+                      {interaction.memberDetails.drug2Users.map(user => 
+                        ` ${user.name} (${user.dosage} ${user.frequency})`
+                      ).join(', ')}
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {summary && (
+        <div className="summary-section">
+          <div className="summary-header">
+            <h3>📊 Interaction Analysis Summary</h3>
+            <button 
+              className="toggle-details"
+              onClick={() => setShowDetailedResults(!showDetailedResults)}
+            >
+              {showDetailedResults ? '🔼 Hide Details' : '🔽 Show Details'}
+            </button>
+          </div>
+          
+          <div className="summary-stats">
+            <div className="stat">
+              <span className="stat-number">{summary.totalCombinationsTested}</span>
+              <span className="stat-label">Drug Combinations Tested</span>
+            </div>
+            <div className="stat">
+              <span className="stat-number">{summary.interactionsFound}</span>
+              <span className="stat-label">Interactions Found</span>
+            </div>
+            <div className="stat">
+              <span className="stat-number">{summary.safeCombinationCount}</span>
+              <span className="stat-label">Safe Combinations</span>
+            </div>
+          </div>
+
+          {summary.severityBreakdown && (summary.severityBreakdown.high > 0 || summary.severityBreakdown.moderate > 0) && (
+            <div className="severity-breakdown">
+              <h4>Severity Breakdown:</h4>
+              <div className="severity-stats">
+                {summary.severityBreakdown.high > 0 && (
+                  <span className="severity-stat high">High: {summary.severityBreakdown.high}</span>
+                )}
+                {summary.severityBreakdown.moderate > 0 && (
+                  <span className="severity-stat moderate">Moderate: {summary.severityBreakdown.moderate}</span>
+                )}
+                {summary.severityBreakdown.low > 0 && (
+                  <span className="severity-stat low">Low: {summary.severityBreakdown.low}</span>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {showDetailedResults && (
+        <div className="detailed-results">
+          {Object.keys(familyMemberMedications).length > 0 && (
+            <div className="family-medications">
+              <h3>👨‍👩‍👧‍👦 Family Medications Overview</h3>
+              {Object.entries(familyMemberMedications).map(([memberName, medications]) => (
+                <div key={memberName} className="member-medications">
+                  <h4>{memberName}</h4>
+                  <div className="medication-list">
+                    {medications.map((med, index) => (
+                      <div key={index} className="medication-item">
+                        <span className="drug-name">{med.drugName}</span>
+                        <span className="drug-details">
+                          {med.category} | {med.strength} | {med.dosage} {med.frequency}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {testedCombinations.length > 0 && (
+            <div className="tested-combinations">
+              <h3>🔍 All Tested Drug Combinations</h3>
+              <div className="combinations-grid">
+                {testedCombinations.map((combo, index) => (
+                  <div 
+                    key={index} 
+                    className={`combination-item ${combo.hasInteraction ? 'has-interaction' : 'safe'}`}
+                  >
+                    <div className="combination-header">
+                      <span className="combination-status">
+                        {combo.hasInteraction ? '⚠️ INTERACTION' : '✅ SAFE'}
+                      </span>
+                    </div>
+                    <div className="combination-drugs">
+                      <div className="drug-info">
+                        <strong>{combo.drug1.name}</strong>
+                        <span>{combo.drug1.category} | {combo.drug1.strength}</span>
+                        <span>Users: {combo.drug1.takenBy.map(u => u.name).join(', ')}</span>
+                      </div>
+                      <div className="combination-plus">+</div>
+                      <div className="drug-info">
+                        <strong>{combo.drug2.name}</strong>
+                        <span>{combo.drug2.category} | {combo.drug2.strength}</span>
+                        <span>Users: {combo.drug2.takenBy.map(u => u.name).join(', ')}</span>
+                      </div>
+                    </div>
+                    {combo.hasInteraction && combo.interactionDetails && (
+                      <div className="interaction-summary">
+                        <div className="risk-type">{combo.interactionDetails.riskType}</div>
+                        <div className="quick-description">{combo.interactionDetails.description}</div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="interaction-info">
         <h4>ℹ️ About Drug Interactions</h4>
