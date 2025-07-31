@@ -11,13 +11,18 @@
     "install:all": "npm install && cd client && npm install && cd ../server && npm install"
   },
   "devDependencies": {
-    "concurrently": "^8.0.0"
+    "concurrently": "^8.2.2"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/your-username/drugreco-mvp.git"
   },
-  "keywords": ["drug-recommendation", "family-health", "medication-management", "mvp"],
+  "keywords": [
+    "drug-recommendation",
+    "family-health",
+    "medication-management",
+    "mvp"
+  ],
   "author": "Your Name",
   "license": "MIT"
 }

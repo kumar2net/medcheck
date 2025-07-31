@@ -1000,10 +1000,8 @@ app.get('/api/drugs/search', async (req, res, next) => {
   }
 });
 
-// Serve React app for any non-API routes
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/build/index.html'));
-});
+// Note: React app is served separately by development server on port 3000
+// This catch-all route is only needed for production builds
 
 // Apply error handler
 app.use(errorHandler);
