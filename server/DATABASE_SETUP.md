@@ -66,4 +66,10 @@ If you get "role does not exist" errors, make sure:
 If PostgreSQL commands are not found:
 ```bash
 export PATH="/opt/homebrew/Cellar/postgresql@17/17.5/bin:$PATH"
-``` 
+```
+
+---
+
+**Last Updated:** 2025-07-31  
+**PostgreSQL Version:** 17.5 via Homebrew  
+**Status:** Production-ready database setup 

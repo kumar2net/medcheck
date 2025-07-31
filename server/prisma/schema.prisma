@@ -28,7 +28,10 @@ model Drug {
   alternatives String?
   
   // Relationships
-  familyMedications FamilyMedication[]
+  familyMedications     FamilyMedication[]
+  interactionsAsDrug1   DrugInteraction[] @relation("DrugInteractionDrug1")
+  interactionsAsDrug2   DrugInteraction[] @relation("DrugInteractionDrug2")
+  rxnormMappings        DrugRxnormMapping[]
 
   @@map("drugs")
 }
@@ -83,4 +86,146 @@ model FamilyMedication {
   drug          Drug         @relation(fields: [drugId], references: [id])
 
   @@map("family_medications")
+}
+
+// Clinical Data Sources
+model DataSource {
+  id                Int      @id @default(autoincrement())
+  name              String   @db.VarChar(100)
+  provider          String?  @db.VarChar(100)
+  apiEndpoint       String?  @map("api_endpoint")
+  credibilityScore  Decimal? @default(0.95) @map("credibility_score") @db.Decimal(3,2)
+  lastUpdate        DateTime? @map("last_update")
+  updateFrequency   String?  @default("weekly") @map("update_frequency") @db.VarChar(50)
+  isActive          Boolean  @default(true) @map("is_active")
+  apiKeyRequired    Boolean  @default(false) @map("api_key_required")
+  rateLimitPerHour  Int?     @default(1000) @map("rate_limit_per_hour")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  // Relationships
+  drugInteractions  DrugInteraction[]
+  clinicalAlerts    ClinicalAlert[]
+
+  @@map("data_sources")
+}
+
+// Clinical Drug Interactions
+model DrugInteraction {
+  id                      Int      @id @default(autoincrement())
+  drug1Id                 Int      @map("drug1_id")
+  drug2Id                 Int      @map("drug2_id")
+  drug1Rxcui              String?  @map("drug1_rxcui") @db.VarChar(20)
+  drug2Rxcui              String?  @map("drug2_rxcui") @db.VarChar(20)
+  severity                String   @default("unknown") @db.VarChar(20)
+  mechanism               String?
+  clinicalSignificance    String?  @map("clinical_significance")
+  evidenceLevel           String?  @default("C") @map("evidence_level") @db.VarChar(20)
+  onset                   String?  @default("variable") @db.VarChar(20)
+  documentation           String?  @default("fair") @db.VarChar(20)
+  managementRecommendation String? @map("management_recommendation")
+  sourceId                Int      @map("source_id")
+  confidenceScore         Decimal? @default(0.80) @map("confidence_score") @db.Decimal(3,2)
+  interactionType         String?  @default("drug-drug") @map("interaction_type") @db.VarChar(50)
+  frequency               String?  @default("unknown") @db.VarChar(20)
+  lastVerified            DateTime? @default(now()) @map("last_verified")
+  createdAt               DateTime @default(now()) @map("created_at")
+  updatedAt               DateTime @updatedAt @map("updated_at")
+
+  // Relationships
+  drug1                   Drug        @relation("DrugInteractionDrug1", fields: [drug1Id], references: [id], onDelete: Cascade)
+  drug2                   Drug        @relation("DrugInteractionDrug2", fields: [drug2Id], references: [id], onDelete: Cascade)
+  source                  DataSource  @relation(fields: [sourceId], references: [id], onDelete: Restrict)
+  validationLogs          InteractionValidationLog[]
+
+  @@unique([drug1Id, drug2Id, sourceId], name: "drug_interactions_unique_pair")
+  @@map("drug_interactions")
+}
+
+// Clinical Alerts and Warnings
+model ClinicalAlert {
+  id              Int      @id @default(autoincrement())
+  alertType       String   @map("alert_type") @db.VarChar(50)
+  severity        String   @default("medium") @db.VarChar(20)
+  affectedDrugs   String[] @map("affected_drugs")
+  affectedRxcuis  String[] @map("affected_rxcuis")
+  title           String
+  description     String?
+  recommendation  String?
+  sourceUrl       String?  @map("source_url")
+  sourceId        Int?     @map("source_id")
+  effectiveDate   DateTime? @map("effective_date") @db.Date
+  expiryDate      DateTime? @map("expiry_date") @db.Date
+  isActive        Boolean  @default(true) @map("is_active")
+  priority        Int?     @default(50)
+  targetAudience  String?  @default("healthcare_providers") @map("target_audience") @db.VarChar(100)
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // Relationships
+  source          DataSource? @relation(fields: [sourceId], references: [id], onDelete: SetNull)
+
+  @@map("clinical_alerts")
+}
+
+// Update Session Audit Trail
+model UpdateSession {
+  id                Int      @id @default(autoincrement())
+  sessionType       String   @default("weekly") @map("session_type") @db.VarChar(50)
+  triggerType       String?  @default("scheduled") @map("trigger_type") @db.VarChar(50)
+  startTime         DateTime @default(now()) @map("start_time")
+  endTime           DateTime? @map("end_time")
+  status            String   @default("running") @db.VarChar(20)
+  recordsUpdated    Int      @default(0) @map("records_updated")
+  recordsAdded      Int      @default(0) @map("records_added")
+  recordsDeleted    Int      @default(0) @map("records_deleted")
+  errorsCount       Int      @default(0) @map("errors_count")
+  successRate       Decimal  @default(0.00) @map("success_rate") @db.Decimal(5,2)
+  summaryReport     Json?    @map("summary_report")
+  triggeredBy       String?  @default("system") @map("triggered_by") @db.VarChar(100)
+  sourceIds         Int[]    @map("source_ids")
+  totalApiCalls     Int      @default(0) @map("total_api_calls")
+  apiFailures       Int      @default(0) @map("api_failures")
+  processingTimeMs  Int      @default(0) @map("processing_time_ms")
+
+  @@map("update_sessions")
+}
+
+// Drug-RxNorm Mapping
+model DrugRxnormMapping {
+  id              Int      @id @default(autoincrement())
+  drugId          Int      @map("drug_id")
+  rxcui           String   @db.VarChar(20)
+  conceptName     String?  @map("concept_name") @db.VarChar(255)
+  termType        String?  @map("term_type") @db.VarChar(10)
+  source          String?  @default("manual") @db.VarChar(50)
+  confidenceScore Decimal? @default(0.90) @map("confidence_score") @db.Decimal(3,2)
+  verified        Boolean? @default(false)
+  verifiedBy      String?  @map("verified_by") @db.VarChar(100)
+  verifiedAt      DateTime? @map("verified_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // Relationships
+  drug            Drug     @relation(fields: [drugId], references: [id], onDelete: Cascade)
+
+  @@unique([drugId, rxcui], name: "drug_rxnorm_mapping_unique_idx")
+  @@map("drug_rxnorm_mapping")
+}
+
+// Interaction Validation Log
+model InteractionValidationLog {
+  id                Int      @id @default(autoincrement())
+  interactionId     Int      @map("interaction_id")
+  validationSource  String   @map("validation_source") @db.VarChar(100)
+  validationStatus  String   @map("validation_status") @db.VarChar(20)
+  validationScore   Decimal? @map("validation_score") @db.Decimal(3,2)
+  validationNotes   String?  @map("validation_notes")
+  validatedBy       String?  @default("system") @map("validated_by") @db.VarChar(100)
+  validatedAt       DateTime @default(now()) @map("validated_at")
+
+  // Relationships
+  interaction       DrugInteraction @relation(fields: [interactionId], references: [id], onDelete: Cascade)
+
+  @@map("interaction_validation_log")
 }
