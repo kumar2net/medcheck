@@ -2,7 +2,7 @@
 
 ## Available Medications
 
-The DrugReco MVP comes pre-loaded with 8 common medications across different categories:
+The DrugReco system now integrates **real clinical data from FDA RxNav APIs** plus a curated set of 8 common medications for testing:
 
 ### 🩺 **Diabetes**
 - **Startglim M2** - Glimepiride + Metformin (Mankind Pharma)
@@ -95,8 +95,43 @@ cd server && npm run db:reset
 cd server && npm run db:seed
 ```
 
+## 🏥 Clinical Data Integration (NEW)
+
+### Real-Time Data Sources
+- **FDA RxNav APIs** - 100,000+ drug concepts with real-time interaction data
+- **RxNorm Database** - Standardized drug naming and identification
+- **FDA Safety Alerts** - Continuous monitoring for drug recalls and warnings
+- **Clinical Validation** - Multi-source verification with confidence scoring
+
+### Clinical Features
+- **Automated Updates** - Weekly synchronization every Monday at 2 AM
+- **Emergency Monitoring** - Real-time safety alert detection every 6 hours
+- **RxNorm Mapping** - Automatic mapping of internal drugs to FDA concepts
+- **Interaction Validation** - Cross-reference system for data accuracy
+
+### API Endpoints for Clinical Data
+```bash
+# Check clinical interactions
+POST /api/clinical/interactions/check
+
+# Real-time RxNav integration
+GET /api/clinical/interactions/realtime/:drug1Id/:drug2Id
+
+# Safety alerts monitoring
+POST /api/clinical/alerts/check
+
+# System status and statistics
+GET /api/clinical/status
+```
+
+### Data Quality Assurance
+- **Credibility Scoring** - RxNav (0.95), FDA Alerts (0.99), Manual (0.85)
+- **Validation Logs** - Complete audit trail for all clinical data changes
+- **Confidence Thresholds** - Minimum 75% confidence for validated interactions
+- **Source Attribution** - Full traceability to original clinical sources
+
 ---
 
 **Last Updated:** 2025-07-31  
-**Database Version:** 8 medications across 6 categories  
-**Status:** Ready for user testing and expansion
+**Database Version:** 8 test medications + 100,000+ RxNorm concepts  
+**Status:** Production-ready with clinical data integration ✅
