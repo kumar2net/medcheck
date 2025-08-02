@@ -11,7 +11,7 @@ function App() {
       <nav className="app-navigation">
         <div className="nav-container">
           <div className="nav-brand">
-            <h1>💊 DrugReco</h1>
+            <h1>💊 MedicineChk</h1>
           </div>
           <div className="nav-tabs">
             <button 

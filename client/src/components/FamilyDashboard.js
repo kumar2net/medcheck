@@ -3,6 +3,7 @@ import { familyApiService } from '../services/familyApi';
 import FamilyMemberCard from './FamilyMemberCard';
 import FamilyMemberForm from './FamilyMemberForm';
 import MedicationModal from './MedicationModal';
+import MemberInteractionModal from './MemberInteractionModal';
 import InteractionAlerts from './InteractionAlerts';
 import './FamilyDashboard.css';
 
@@ -16,6 +17,8 @@ const FamilyDashboard = () => {
   const [editingMember, setEditingMember] = useState(null);
   const [interactions, setInteractions] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showMemberInteractionModal, setShowMemberInteractionModal] = useState(false);
+  const [selectedMemberForInteraction, setSelectedMemberForInteraction] = useState(null);
 
   useEffect(() => {
     loadFamilyMembers();
@@ -85,6 +88,16 @@ const FamilyDashboard = () => {
     setSelectedMember(null);
     await loadFamilyMembers();
     await checkFamilyInteractions();
+  };
+
+  const handleMemberInteraction = (member) => {
+    setSelectedMemberForInteraction(member);
+    setShowMemberInteractionModal(true);
+  };
+
+  const handleMemberInteractionClose = () => {
+    setShowMemberInteractionModal(false);
+    setSelectedMemberForInteraction(null);
   };
 
   const filteredMembers = familyMembers.filter(member =>
@@ -194,6 +207,8 @@ const FamilyDashboard = () => {
               onEdit={handleEditMember}
               onDelete={handleDeleteMember}
               onManageMedications={handleManageMedications}
+              onMemberInteraction={handleMemberInteraction}
+              selectedForInteraction={selectedMemberForInteraction?.id === member.id}
             />
           ))
         )}
@@ -218,6 +233,13 @@ const FamilyDashboard = () => {
             setShowMedicationModal(false);
             setSelectedMember(null);
           }}
+        />
+      )}
+
+      {showMemberInteractionModal && selectedMemberForInteraction && (
+        <MemberInteractionModal
+          member={selectedMemberForInteraction}
+          onClose={handleMemberInteractionClose}
         />
       )}
     </div>

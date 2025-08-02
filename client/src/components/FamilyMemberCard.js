@@ -1,8 +1,21 @@
 import React from 'react';
 
-const FamilyMemberCard = ({ member, onEdit, onDelete, onManageMedications }) => {
-  const allergies = member.allergies ? JSON.parse(member.allergies) : [];
-  const conditions = member.conditions ? JSON.parse(member.conditions) : [];
+// Helper function to safely parse JSON or treat as array/text
+const safeParseArrayField = (field) => {
+  if (!field) return [];
+  
+  try {
+    const parsed = JSON.parse(field);
+    return Array.isArray(parsed) ? parsed : [parsed];
+  } catch (error) {
+    // If parsing fails, treat as comma-separated text
+    return field.split(/[,;|]/).map(item => item.trim()).filter(item => item.length > 0);
+  }
+};
+
+const FamilyMemberCard = ({ member, onEdit, onDelete, onManageMedications, onMemberInteraction, selectedForInteraction }) => {
+  const allergies = safeParseArrayField(member.allergies);
+  const conditions = safeParseArrayField(member.conditions);
   const medicationCount = member.medications ? member.medications.length : 0;
 
   return (
@@ -92,6 +105,14 @@ const FamilyMemberCard = ({ member, onEdit, onDelete, onManageMedications }) => 
         >
           💊 Medications
         </button>
+        {medicationCount > 0 && onMemberInteraction && (
+          <button 
+            onClick={() => onMemberInteraction(member)}
+            className={`action-btn ${selectedForInteraction ? 'active' : 'info'}`}
+          >
+            🔍 Interactions
+          </button>
+        )}
         <button 
           onClick={() => onEdit(member)}
           className="action-btn secondary"

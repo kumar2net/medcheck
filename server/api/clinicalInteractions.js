@@ -63,7 +63,7 @@ router.post('/check', async (req, res, next) => {
     const processingTime = Date.now() - startTime;
     
     // Log the interaction check
-    logger.logInfo('clinical_interaction_check', {
+    logger.info('clinical_interaction_check', {
       drugCount: drugs.length,
       interactionsFound: allInteractions.length,
       alertsFound: safetyAlerts.length,

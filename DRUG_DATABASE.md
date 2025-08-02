@@ -2,7 +2,7 @@
 
 ## Available Medications
 
-The DrugReco system now integrates **real clinical data from FDA RxNav APIs** plus a curated set of 8 common medications for testing:
+The MedicineChk system now integrates **real clinical data from FDA RxNav APIs** plus a curated set of 8 common medications for testing:
 
 ### 🩺 **Diabetes**
 - **Startglim M2** - Glimepiride + Metformin (Mankind Pharma)
@@ -132,6 +132,6 @@ GET /api/clinical/status
 
 ---
 
-**Last Updated:** 2025-07-31  
+**Last Updated:** 2025-08-02  
 **Database Version:** 8 test medications + 100,000+ RxNorm concepts  
 **Status:** Production-ready with clinical data integration ✅

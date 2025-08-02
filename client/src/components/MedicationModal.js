@@ -131,7 +131,21 @@ const MedicationModal = ({ member, onSave, onClose }) => {
 };
 
 const MedicationCard = ({ medication, onEdit, onDelete }) => {
-  const sideEffects = medication.drug.sideEffects ? JSON.parse(medication.drug.sideEffects) : [];
+  const sideEffects = (() => {
+    if (!medication.drug.sideEffects) return [];
+    
+    try {
+      // Try to parse as JSON first
+      const parsed = JSON.parse(medication.drug.sideEffects);
+      return Array.isArray(parsed) ? parsed : [parsed];
+    } catch (error) {
+      // If parsing fails, treat as plain text and split by common delimiters
+      return medication.drug.sideEffects
+        .split(/[,;|]/)
+        .map(effect => effect.trim())
+        .filter(effect => effect.length > 0);
+    }
+  })();
 
   return (
     <div className="medication-card">

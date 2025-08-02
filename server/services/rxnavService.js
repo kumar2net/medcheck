@@ -34,13 +34,13 @@ class RxNavService {
     
     for (let attempt = 1; attempt <= this.retryAttempts; attempt++) {
       try {
-        logger.logInfo('rxnav_request', `Attempt ${attempt}: ${url.toString()}`);
+        logger.info('rxnav_request', `Attempt ${attempt}: ${url.toString()}`);
         
         const response = await fetch(url.toString(), {
           method: 'GET',
           timeout: this.timeout,
           headers: {
-            'User-Agent': 'DrugReco/1.0 (Healthcare Application)',
+            'User-Agent': 'MedicineChk/1.0 (Healthcare Application)',
             'Accept': 'application/json'
           }
         });
@@ -51,7 +51,7 @@ class RxNavService {
 
         const data = await response.json();
         
-        logger.logInfo('rxnav_success', `RxNav API request successful: ${endpoint}`);
+        logger.info('rxnav_success', `RxNav API request successful: ${endpoint}`);
         return data;
 
       } catch (error) {
@@ -116,7 +116,7 @@ class RxNavService {
         }
       }
 
-      logger.logInfo('rxnav_search', `Found ${results.length} drugs for "${drugName}"`);
+      logger.info('rxnav_search', `Found ${results.length} drugs for "${drugName}"`);
       return results;
 
     } catch (error) {
@@ -178,7 +178,7 @@ class RxNavService {
         }
       }
 
-      logger.logInfo('rxnav_interactions', `Found ${interactions.length} interactions for RXCUI ${rxcui}`);
+      logger.info('rxnav_interactions', `Found ${interactions.length} interactions for RXCUI ${rxcui}`);
       return interactions;
 
     } catch (error) {
@@ -285,7 +285,7 @@ class RxNavService {
         }
       }
 
-      logger.logInfo('rxnav_related', `Found ${related.length} related concepts for RXCUI ${rxcui}`);
+      logger.info('rxnav_related', `Found ${related.length} related concepts for RXCUI ${rxcui}`);
       return related;
 
     } catch (error) {
@@ -348,7 +348,7 @@ class RxNavService {
         }
       }
 
-      logger.logInfo('rxnav_pair_interaction', `Found ${interactions.length} interactions between ${rxcui1} and ${rxcui2}`);
+      logger.info('rxnav_pair_interaction', `Found ${interactions.length} interactions between ${rxcui1} and ${rxcui2}`);
       return interactions;
 
     } catch (error) {

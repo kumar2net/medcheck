@@ -1,24 +1,26 @@
 {
-  "name": "drugreco-mvp",
+  "name": "medicinechk-mvp",
   "version": "1.0.0",
   "private": true,
-  "description": "DrugReco MVP - Drug Recommendation and Family Management App",
+  "description": "MedicineChk MVP - Medicine Checking and Family Management App",
   "scripts": {
     "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
+    "dev:safe": "bash server/start-db.sh && npm run dev",
     "server:dev": "cd server && npm run dev",
     "client:dev": "cd client && npm start",
     "build": "cd client && npm run build",
-    "install:all": "npm install && cd client && npm install && cd ../server && npm install"
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install",
+    "db:check": "bash server/start-db.sh"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/drugreco-mvp.git"
+    "url": "https://github.com/your-username/medicinechk-mvp.git"
   },
   "keywords": [
-    "drug-recommendation",
+    "medicine-checking",
     "family-health",
     "medication-management",
     "mvp"

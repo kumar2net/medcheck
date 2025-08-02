@@ -31,7 +31,7 @@ class ClinicalDataManager {
    */
   async initialize() {
     try {
-      logger.logInfo('clinical_manager_init', 'Initializing Clinical Data Manager');
+      logger.info('clinical_manager_init', 'Initializing Clinical Data Manager');
       
       // Verify database connection
       await this.verifyDatabaseConnection();
@@ -45,7 +45,7 @@ class ClinicalDataManager {
       // Start emergency monitoring
       this.startEmergencyMonitoring();
       
-      logger.logInfo('clinical_manager_ready', 'Clinical Data Manager initialized successfully');
+      logger.info('clinical_manager_ready', 'Clinical Data Manager initialized successfully');
       
     } catch (error) {
       logger.logError('clinical_manager_init_error', `Failed to initialize: ${error.message}`);
@@ -59,7 +59,7 @@ class ClinicalDataManager {
   async verifyDatabaseConnection() {
     try {
       await this.prisma.dataSource.findMany({ take: 1 });
-      logger.logInfo('database_check', 'Database connection verified');
+      logger.info('database_check', 'Database connection verified');
     } catch (error) {
       throw new Error(`Database connection failed: ${error.message}`);
     }
@@ -83,7 +83,7 @@ class ClinicalDataManager {
       for (const [index, result] of healthChecks.entries()) {
         if (result.status === 'fulfilled' && result.value.status === 'healthy') {
           healthyCount++;
-          logger.logInfo('source_health_ok', `${result.value.service} is healthy`);
+          logger.info('source_health_ok', `${result.value.service} is healthy`);
         } else {
           logger.logError('source_health_fail', `Health check failed for source ${index}`);
         }
@@ -93,7 +93,7 @@ class ClinicalDataManager {
         throw new Error('No healthy data sources available');
       }
 
-      logger.logInfo('health_check_complete', `${healthyCount}/${healthChecks.length} sources healthy`);
+      logger.info('health_check_complete', `${healthyCount}/${healthChecks.length} sources healthy`);
       
     } catch (error) {
       throw new Error(`Data source health check failed: ${error.message}`);
@@ -106,7 +106,7 @@ class ClinicalDataManager {
   scheduleWeeklyUpdates() {
     cron.schedule(this.updateSchedule, async () => {
       if (!this.isUpdateRunning) {
-        logger.logInfo('scheduled_update_start', 'Starting scheduled weekly update');
+        logger.info('scheduled_update_start', 'Starting scheduled weekly update');
         await this.performWeeklyUpdate();
       } else {
         logger.logWarning('update_already_running', 'Skipping scheduled update - another update is running');
@@ -116,7 +116,7 @@ class ClinicalDataManager {
       timezone: "UTC"
     });
 
-    logger.logInfo('update_scheduled', `Weekly updates scheduled: ${this.updateSchedule}`);
+    logger.info('update_scheduled', `Weekly updates scheduled: ${this.updateSchedule}`);
   }
 
   /**
@@ -141,7 +141,7 @@ class ClinicalDataManager {
     // Start monitoring
     setTimeout(monitorEmergencyAlerts, this.emergencyCheckInterval);
     
-    logger.logInfo('emergency_monitoring_start', 'Emergency alert monitoring started');
+    logger.info('emergency_monitoring_start', 'Emergency alert monitoring started');
   }
 
   /**
@@ -160,7 +160,7 @@ class ClinicalDataManager {
       // Create update session
       updateSession = await this.createUpdateSession('weekly', 'scheduled');
       
-      logger.logInfo('weekly_update_start', `Starting weekly update session ${updateSession.id}`);
+      logger.info('weekly_update_start', `Starting weekly update session ${updateSession.id}`);
 
       // Step 1: Update RxNorm mappings for existing drugs
       const mappingResults = await this.updateRxNormMappings(updateSession.id);
@@ -182,7 +182,7 @@ class ClinicalDataManager {
         updates: updateResults
       });
 
-      logger.logInfo('weekly_update_complete', `Weekly update completed successfully`);
+      logger.info('weekly_update_complete', `Weekly update completed successfully`);
 
     } catch (error) {
       logger.logError('weekly_update_error', `Weekly update failed: ${error.message}`);
@@ -215,7 +215,7 @@ class ClinicalDataManager {
    */
   async updateRxNormMappings(sessionId) {
     try {
-      logger.logInfo('rxnorm_mapping_start', 'Starting RxNorm mapping updates');
+      logger.info('rxnorm_mapping_start', 'Starting RxNorm mapping updates');
       
       const drugs = await this.prisma.drug.findMany({
         include: {
@@ -293,7 +293,7 @@ class ClinicalDataManager {
         apiCalls
       };
 
-      logger.logInfo('rxnorm_mapping_complete', `RxNorm mapping complete: ${JSON.stringify(result)}`);
+      logger.info('rxnorm_mapping_complete', `RxNorm mapping complete: ${JSON.stringify(result)}`);
       return result;
 
     } catch (error) {
@@ -307,7 +307,7 @@ class ClinicalDataManager {
    */
   async updateInteractionData(sessionId) {
     try {
-      logger.logInfo('interaction_update_start', 'Starting interaction data update');
+      logger.info('interaction_update_start', 'Starting interaction data update');
 
       const mappings = await this.prisma.drugRxnormMapping.findMany({
         where: {
@@ -401,7 +401,7 @@ class ClinicalDataManager {
         apiCalls
       };
 
-      logger.logInfo('interaction_update_complete', `Interaction update complete: ${JSON.stringify(result)}`);
+      logger.info('interaction_update_complete', `Interaction update complete: ${JSON.stringify(result)}`);
       return result;
 
     } catch (error) {
@@ -415,7 +415,7 @@ class ClinicalDataManager {
    */
   async validateInteractionData(sessionId) {
     try {
-      logger.logInfo('validation_start', 'Starting interaction data validation');
+      logger.info('validation_start', 'Starting interaction data validation');
 
       // Get recent interactions that need validation
       const recentInteractions = await this.prisma.drugInteraction.findMany({
@@ -477,7 +477,7 @@ class ClinicalDataManager {
         passRate: validationsCompleted > 0 ? (validationsPassed / validationsCompleted) * 100 : 0
       };
 
-      logger.logInfo('validation_complete', `Validation complete: ${JSON.stringify(result)}`);
+      logger.info('validation_complete', `Validation complete: ${JSON.stringify(result)}`);
       return result;
 
     } catch (error) {
@@ -538,7 +538,7 @@ class ClinicalDataManager {
    */
   async applyValidatedUpdates(sessionId, validationResults) {
     try {
-      logger.logInfo('apply_updates_start', 'Applying validated updates');
+      logger.info('apply_updates_start', 'Applying validated updates');
 
       // For now, just mark all recent interactions as verified
       // In future, implement more sophisticated update logic
@@ -559,7 +559,7 @@ class ClinicalDataManager {
         status: 'completed'
       };
 
-      logger.logInfo('apply_updates_complete', `Updates applied: ${JSON.stringify(result)}`);
+      logger.info('apply_updates_complete', `Updates applied: ${JSON.stringify(result)}`);
       return result;
 
     } catch (error) {
@@ -573,12 +573,12 @@ class ClinicalDataManager {
    */
   async checkEmergencyAlerts() {
     try {
-      logger.logInfo('emergency_check_start', 'Checking for emergency safety alerts');
+      logger.info('emergency_check_start', 'Checking for emergency safety alerts');
 
       // For now, just log that we're checking
       // In future, implement FDA safety alert monitoring
       
-      logger.logInfo('emergency_check_complete', 'Emergency check completed - no alerts found');
+      logger.info('emergency_check_complete', 'Emergency check completed - no alerts found');
 
     } catch (error) {
       logger.logError('emergency_check_error', `Emergency check failed: ${error.message}`);
@@ -607,7 +607,7 @@ class ClinicalDataManager {
         }
       });
 
-      logger.logInfo('session_complete', `Update session ${sessionId} completed successfully`);
+      logger.info('session_complete', `Update session ${sessionId} completed successfully`);
 
     } catch (error) {
       logger.logError('session_complete_error', `Failed to complete session ${sessionId}: ${error.message}`);
@@ -686,7 +686,7 @@ class ClinicalDataManager {
   async shutdown() {
     this.emergencyMonitoringActive = false;
     await this.prisma.$disconnect();
-    logger.logInfo('clinical_manager_shutdown', 'Clinical Data Manager shut down');
+    logger.info('clinical_manager_shutdown', 'Clinical Data Manager shut down');
   }
 
   /**
@@ -697,7 +697,7 @@ class ClinicalDataManager {
       throw new Error('Update already running');
     }
 
-    logger.logInfo('manual_update_trigger', 'Manual update triggered');
+    logger.info('manual_update_trigger', 'Manual update triggered');
     await this.performWeeklyUpdate();
   }
 

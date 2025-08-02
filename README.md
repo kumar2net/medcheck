@@ -1,4 +1,4 @@
-# 🏥 DrugReco MVP - Drug Recommendation & Family Health Management
+# 🏥 MedicineChk MVP - Medicine Checking & Family Health Management
 
 A comprehensive web application for managing family medications, checking drug interactions, and discovering drug alternatives.
 
@@ -56,8 +56,8 @@ A comprehensive web application for managing family medications, checking drug i
 
 ### 1. Clone Repository
 ```bash
-git clone https://github.com/your-username/drugreco-mvp.git
-cd drugreco-mvp
+git clone https://github.com/your-username/medicinechk-mvp.git
+cd medicinechk-mvp
 ```
 
 ### 2. Install Dependencies
@@ -71,7 +71,7 @@ npm run install:all
 brew services start postgresql@17
 
 # Create database
-createdb drugreco_dev
+createdb medicinechk_dev
 
 # Set up environment variables
 cp server/.env.example server/.env
@@ -98,7 +98,7 @@ This will start both the frontend (http://localhost:3000) and backend (http://lo
 ### Server Environment Variables (`server/.env`)
 ```env
 # Database
-DATABASE_URL="postgresql://username:password@localhost:5432/drugreco_dev"
+DATABASE_URL="postgresql://username:password@localhost:5432/medicinechk_dev"
 
 # Server Configuration
 PORT=3001
@@ -118,7 +118,7 @@ YOLO_MODE=true
 ## 🏗️ Project Structure
 
 ```
-drugreco-mvp/
+medicinechk-mvp/
 ├── client/                 # React frontend application
 │   ├── public/            # Static assets
 │   ├── src/
@@ -260,7 +260,7 @@ npm run clinical:status   # Check clinical data manager status
 brew services start postgresql@17
 
 # Check database exists
-psql -l | grep drugreco_dev
+psql -l | grep medicinechk_dev
 ```
 
 **Port Already in Use**
@@ -300,6 +300,34 @@ npx prisma generate
 - **Validation**: Multi-source consensus with confidence scoring
 - **Audit Trail**: Complete tracking of all clinical data changes
 
+## 🔧 Troubleshooting
+
+### Database Connection Issues
+
+**Problem:** `Failed to load family members: Server error (500)` or `Can't reach database server at localhost:5432`
+
+**Solution:**
+```bash
+# Option 1: Use the safe dev script (recommended)
+npm run dev:safe
+
+# Option 2: Manual database check and start
+npm run db:check
+
+# Option 3: Manual PostgreSQL restart
+brew services start postgresql@17
+```
+
+**Prevention:** PostgreSQL is now configured to auto-start on system boot. The `npm run dev:safe` command automatically checks and starts the database before launching the app.
+
+### Common Development Issues
+
+1. **Port already in use:** Kill existing processes with `lsof -ti:3001 | xargs kill -9`
+2. **Missing dependencies:** Run `npm run install:all` to install all packages
+3. **Database schema issues:** Run `cd server && npm run db:reset` to reset database
+
+For detailed database troubleshooting, see [server/DATABASE_SETUP.md](server/DATABASE_SETUP.md).
+
 ## 📞 Support
 
 For issues and questions:
@@ -318,4 +346,4 @@ For issues and questions:
 
 **Version:** 1.1.0  
 **Status:** Production-Ready with Clinical Data Integration  
-**Last Updated:** 2025-07-31
+**Last Updated:** 2025-08-02

@@ -1,12 +1,12 @@
 # Product Requirements Document: Netlify Migration
 
 ## Project Overview
-**Date:** 2025-07-31  
-**Project:** DrugReco Family Medication Management System  
+**Date:** 2025-08-02  
+**Project:** MedicineChk Family Medication Management System  
 **Migration:** Express.js → Netlify with Serverless Functions + Neon Database
 
 ## Executive Summary
-This document outlines the migration of the DrugReco application from Express.js to Netlify, implementing serverless functions and Neon database for improved scalability, cost-effectiveness, and modern architecture.
+This document outlines the migration of the MedicineChk application from Express.js to Netlify, implementing serverless functions and Neon database for improved scalability, cost-effectiveness, and modern architecture.
 
 ## Migration Objectives
 
@@ -226,7 +226,7 @@ ALLOWED_ORIGINS="https://your-netlify-app.netlify.app"
 
 ## Conclusion
 
-The migration to Netlify with serverless functions and Neon database represents a significant architectural improvement for the DrugReco application. This modern stack provides better scalability, cost-effectiveness, and developer experience while maintaining all existing functionality.
+The migration to Netlify with serverless functions and Neon database represents a significant architectural improvement for the MedicineChk application. This modern stack provides better scalability, cost-effectiveness, and developer experience while maintaining all existing functionality.
 
 The implementation preserves the family-centered medication management features while providing a foundation for future enhancements and growth.
 

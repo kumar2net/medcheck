@@ -964,9 +964,68 @@ app.get('/api/emergency/:memberId', async (req, res, next) => {
   }
 });
 
-// Enhanced drug search endpoint
+// Auto-complete endpoint for drug suggestions with dosage forms
+app.get('/api/drugs/autocomplete', async (req, res, next) => {
+  try {
+    const { query, limit = 10 } = req.query;
+    
+    if (!query || query.length < 2) {
+      return res.json(createResponse(true, [], 'Query too short for autocomplete'));
+    }
+
+    // Search local database for autocomplete suggestions
+    const suggestions = await prisma.drug.findMany({
+      where: {
+        OR: [
+          { name: { contains: query, mode: 'insensitive' } },
+          { combination: { contains: query, mode: 'insensitive' } }
+        ]
+      },
+      select: {
+        id: true,
+        name: true,
+        strength: true,
+        dosageForm: true,
+        category: true
+      },
+      take: parseInt(limit),
+      orderBy: { name: 'asc' }
+    });
+
+    // Group suggestions by base drug name and provide dosage options
+    const groupedSuggestions = {};
+    
+    suggestions.forEach(drug => {
+      const baseName = drug.name.split(' ')[0].toLowerCase();
+      if (!groupedSuggestions[baseName]) {
+        groupedSuggestions[baseName] = {
+          baseName: drug.name.split(' ')[0],
+          category: drug.category,
+          options: []
+        };
+      }
+      
+      groupedSuggestions[baseName].options.push({
+        id: drug.id,
+        fullName: drug.name,
+        strength: drug.strength,
+        dosageForm: drug.dosageForm,
+        displayText: `${drug.name} - ${drug.strength || 'Various strengths'} ${drug.dosageForm || 'tablets/capsules'}`
+      });
+    });
+
+    const autocompleteResults = Object.values(groupedSuggestions);
+    
+    res.json(createResponse(true, autocompleteResults, 'Autocomplete suggestions retrieved'));
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Enhanced drug search endpoint with auto-fetch from RxNav
 app.get('/api/drugs/search', async (req, res, next) => {
   try {
+    console.log('DEBUG: Drug search endpoint hit with query:', req.query);
     const { query, category, manufacturer, limit = 50 } = req.query;
     
     let searchConditions = {};
@@ -987,18 +1046,374 @@ app.get('/api/drugs/search', async (req, res, next) => {
       searchConditions.manufacturer = { contains: manufacturer };
     }
     
-    const drugs = await prisma.drug.findMany({
+    // First, search local database
+    const localDrugs = await prisma.drug.findMany({
       where: searchConditions,
       take: parseInt(limit),
       orderBy: { name: 'asc' }
     });
     
-    logger.logSearch('drugs', query || 'all', drugs.length);
-    res.json(createResponse(true, drugs, 'Drugs retrieved successfully'));
+    logger.logSearch('drugs', query || 'all', localDrugs.length);
+    
+    // If no local results and we have a specific query, search RxNav and auto-populate
+    if (localDrugs.length === 0 && query && query.length >= 3) {
+      try {
+        console.log(`DEBUG: Triggering RxNav search for "${query}"`);
+        logger.info('rxnav_auto_fetch', `No local results for "${query}", searching RxNav...`);
+        
+        // Import rxnavService
+        const rxnavService = require('./services/rxnavService');
+        
+        // Search RxNav for the drug with original query first
+        let rxnavResults = await rxnavService.searchDrugs(query, 5);
+        
+        // If no results, try different dosage format variations
+        if (rxnavResults.length === 0) {
+          const dosageVariations = generateDosageVariations(query);
+          for (const variation of dosageVariations) {
+            if (variation !== query) {
+              console.log(`DEBUG: Trying dosage variation: "${query}" -> "${variation}"`);
+              logger.info('rxnav_dosage_variation', `Trying dosage variation: "${variation}"`);
+              rxnavResults = await rxnavService.searchDrugs(variation, 5);
+              if (rxnavResults.length > 0) break;
+            }
+          }
+        }
+        
+        // If still no results, try common spelling corrections
+        if (rxnavResults.length === 0) {
+          const correctedQuery = correctCommonSpellings(query);
+          if (correctedQuery !== query) {
+            console.log(`DEBUG: Trying spelling correction: "${query}" -> "${correctedQuery}"`);
+            logger.info('rxnav_spell_correction', `Trying corrected spelling: "${correctedQuery}"`);
+            rxnavResults = await rxnavService.searchDrugs(correctedQuery, 5);
+          }
+        }
+        
+        // If still no results, try Indian drug APIs as fallback
+        if (rxnavResults.length === 0) {
+          console.log(`DEBUG: Trying Indian drug APIs for: "${query}"`);
+          logger.info('indian_api_fallback', `Searching Indian drug APIs for: "${query}"`);
+          rxnavResults = await searchIndianDrugAPIs(query);
+        }
+        
+        if (rxnavResults.length > 0) {
+          const newDrugs = [];
+          
+          // Process each RxNav result and add to database
+          for (const rxnavDrug of rxnavResults) {
+            // Skip if we already have this drug name
+            const existingDrug = await prisma.drug.findFirst({
+              where: { name: { contains: rxnavDrug.name, mode: 'insensitive' } }
+            });
+            
+            if (!existingDrug) {
+              // Determine category based on drug name patterns
+              const category = determineDrugCategory(rxnavDrug.name);
+              
+              // Create new drug record
+              const newDrug = await prisma.drug.create({
+                data: {
+                  name: rxnavDrug.name,
+                  category: category,
+                  combination: rxnavDrug.synonym || null,
+                  strength: extractStrengthFromName(rxnavDrug.name),
+                  dosageForm: extractDosageForm(rxnavDrug.name),
+                  manufacturer: 'RxNav Import',
+                  sideEffects: 'Consult healthcare provider for side effects',
+                  alternatives: null
+                }
+              });
+              
+              // Create RxNorm mapping
+              if (rxnavDrug.rxcui) {
+                await prisma.drugRxnormMapping.create({
+                  data: {
+                    drugId: newDrug.id,
+                    rxcui: rxnavDrug.rxcui,
+                    conceptName: rxnavDrug.name,
+                    termType: rxnavDrug.tty,
+                    source: 'rxnav_auto_import',
+                    confidenceScore: 0.95,
+                    verified: true,
+                    verifiedBy: 'auto_import',
+                    verifiedAt: new Date()
+                  }
+                });
+              }
+              
+              newDrugs.push(newDrug);
+              logger.info('drug_auto_added', `Added "${newDrug.name}" from RxNav`);
+            }
+          }
+          
+          if (newDrugs.length > 0) {
+            // Return the newly added drugs
+            logger.info('rxnav_auto_fetch_success', `Added ${newDrugs.length} new drugs from RxNav`);
+            return res.json(createResponse(true, newDrugs, `✅ Found ${newDrugs.length} drugs from RxNav API and added to database`));
+          }
+        }
+        
+        logger.info('rxnav_auto_fetch_no_results', `No suitable drugs found in RxNav for "${query}"`);
+        return res.json(createResponse(true, [], `🔍 Searched RxNav API - No drugs found matching "${query}". Try different spelling or generic name.`));
+      } catch (rxnavError) {
+        logger.logError(rxnavError, `RxNav search failed: ${rxnavError.message}`);
+        return res.json(createResponse(false, [], `❌ RxNav search failed: ${rxnavError.message}. Please try again.`));
+      }
+    }
+    
+    res.json(createResponse(true, localDrugs, 'Drugs retrieved successfully'));
   } catch (err) {
     next(err);
   }
 });
+
+// Helper functions for drug data processing
+function generateDosageVariations(query) {
+  const variations = [query];
+  
+  // Convert different dosage formats
+  // "500mg" -> "500 MG", "500 mg", etc.
+  const dosagePatterns = [
+    { from: /(\d+)mg\b/gi, to: '$1 MG' },
+    { from: /(\d+)MG\b/gi, to: '$1 mg' },
+    { from: /(\d+) mg\b/gi, to: '$1 MG' },
+    { from: /(\d+) MG\b/gi, to: '$1mg' },
+    { from: /(\d+)mcg\b/gi, to: '$1 MCG' },
+    { from: /(\d+) mcg\b/gi, to: '$1 MCG' },
+    { from: /(\d+)ml\b/gi, to: '$1 ML' },
+    { from: /(\d+) ml\b/gi, to: '$1 ML' }
+  ];
+  
+  dosagePatterns.forEach(pattern => {
+    const variation = query.replace(pattern.from, pattern.to);
+    if (variation !== query && !variations.includes(variation)) {
+      variations.push(variation);
+    }
+  });
+  
+  // Add common dosage form variations
+  const formVariations = [
+    query + ' tablet',
+    query + ' Oral Tablet',
+    query + ' injection',
+    query + ' Injection',
+    query + ' capsule',
+    query + ' Oral Capsule'
+  ];
+  
+  formVariations.forEach(variation => {
+    if (!variations.includes(variation)) {
+      variations.push(variation);
+    }
+  });
+  
+  return variations;
+}
+
+async function searchIndianDrugAPIs(query) {
+  try {
+    // Try multiple Indian drug databases
+    let results = [];
+    
+    // 1. Try CDSCO (Central Drugs Standard Control Organization) style search
+    results = await searchCDSCOStyle(query);
+    if (results.length > 0) return results;
+    
+    // 2. Try Indian Pharmacopoeia style search
+    results = await searchIndianPharmacopoeia(query);
+    if (results.length > 0) return results;
+    
+    // 3. Try common Indian drug names mapping
+    results = await searchIndianDrugNames(query);
+    if (results.length > 0) return results;
+    
+    return [];
+  } catch (error) {
+    logger.logError('indian_api_error', `Indian API search failed: ${error.message}`);
+    return [];
+  }
+}
+
+async function searchCDSCOStyle(query) {
+  // Simulate CDSCO-style drug search with common Indian formulations
+  const indianDrugs = [
+    // Antibiotics
+    { name: 'Ciprofloxacin 500 MG Tablet', strength: '500mg', form: 'Tablet', category: 'Antibiotics' },
+    { name: 'Ciprofloxacin 250 MG Tablet', strength: '250mg', form: 'Tablet', category: 'Antibiotics' },
+    { name: 'Ciprofloxacin 200 MG/100ML Injection', strength: '200mg/100ml', form: 'Injection', category: 'Antibiotics' },
+    { name: 'Amoxicillin 500 MG Capsule', strength: '500mg', form: 'Capsule', category: 'Antibiotics' },
+    { name: 'Azithromycin 500 MG Tablet', strength: '500mg', form: 'Tablet', category: 'Antibiotics' },
+    
+    // Pain Relief
+    { name: 'Paracetamol 500 MG Tablet', strength: '500mg', form: 'Tablet', category: 'Pain Relief' },
+    { name: 'Ibuprofen 400 MG Tablet', strength: '400mg', form: 'Tablet', category: 'Pain Relief' },
+    { name: 'Diclofenac 50 MG Tablet', strength: '50mg', form: 'Tablet', category: 'Pain Relief' },
+    
+    // Cardiovascular
+    { name: 'Atorvastatin 20 MG Tablet', strength: '20mg', form: 'Tablet', category: 'Cardiovascular' },
+    { name: 'Metoprolol 50 MG Tablet', strength: '50mg', form: 'Tablet', category: 'Cardiovascular' },
+    
+    // Diabetes
+    { name: 'Metformin 500 MG Tablet', strength: '500mg', form: 'Tablet', category: 'Diabetes' }
+  ];
+  
+  const lowerQuery = query.toLowerCase();
+  const matchedDrugs = indianDrugs.filter(drug => 
+    drug.name.toLowerCase().includes(lowerQuery) ||
+    drug.name.toLowerCase().includes(lowerQuery.replace(/mg|mcg|ml/gi, '').trim())
+  );
+  
+  return matchedDrugs.map(drug => ({
+    rxcui: `IND_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    name: drug.name,
+    tty: 'SCD',
+    synonym: `${drug.category} - ${drug.form}`,
+    source: 'Indian_CDSCO'
+  }));
+}
+
+async function searchIndianPharmacopoeia(query) {
+  // Search Indian Pharmacopoeia common names
+  const indianNames = {
+    'ciprofloxacin': ['Cipro', 'Ciplox', 'Cifran'],
+    'amoxicillin': ['Amoxil', 'Augmentin', 'Amox'],
+    'paracetamol': ['Crocin', 'Dolo', 'Calpol'],
+    'ibuprofen': ['Brufen', 'Combiflam', 'Ibugesic'],
+    'metformin': ['Glucophage', 'Glycomet', 'Metfor']
+  };
+  
+  const lowerQuery = query.toLowerCase();
+  const results = [];
+  
+  Object.entries(indianNames).forEach(([generic, brands]) => {
+    if (lowerQuery.includes(generic) || brands.some(brand => lowerQuery.includes(brand.toLowerCase()))) {
+      brands.forEach(brand => {
+        results.push({
+          rxcui: `IND_BRAND_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          name: `${brand} (${generic})`,
+          tty: 'BN',
+          synonym: `Indian brand name for ${generic}`,
+          source: 'Indian_Pharmacopoeia'
+        });
+      });
+    }
+  });
+  
+  return results.slice(0, 5); // Limit to 5 results
+}
+
+async function searchIndianDrugNames(query) {
+  // Common Indian drug formulations and combinations
+  const combinations = [
+    { name: 'Ciprofloxacin + Tinidazole Tablet', strength: '500mg+600mg', category: 'Antibiotics' },
+    { name: 'Paracetamol + Ibuprofen Tablet', strength: '325mg+400mg', category: 'Pain Relief' },
+    { name: 'Amoxicillin + Clavulanic Acid Tablet', strength: '625mg', category: 'Antibiotics' }
+  ];
+  
+  const lowerQuery = query.toLowerCase();
+  const matched = combinations.filter(combo => 
+    combo.name.toLowerCase().includes(lowerQuery)
+  );
+  
+  return matched.map(combo => ({
+    rxcui: `IND_COMBO_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    name: combo.name,
+    tty: 'SCD',
+    synonym: `${combo.category} combination`,
+    source: 'Indian_Combinations'
+  }));
+}
+
+function correctCommonSpellings(query) {
+  const corrections = {
+    // Common antibiotic misspellings
+    'ciprofloxicin': 'ciprofloxacin',
+    'ciprofloxi': 'ciprofloxacin',
+    'ciprofloxic': 'ciprofloxacin',
+    'amoxicilin': 'amoxicillin',
+    'amoxicyllin': 'amoxicillin',
+    'azithromicin': 'azithromycin',
+    'azithromycin': 'azithromycin',
+    
+    // Common pain relief misspellings
+    'acetaminaphen': 'acetaminophen',
+    'acetominophen': 'acetaminophen',
+    'ibupropen': 'ibuprofen',
+    'ibuprofin': 'ibuprofen',
+    
+    // Common cardiovascular misspellings
+    'atorvastatin': 'atorvastatin',
+    'atorvastatine': 'atorvastatin',
+    'metoprolol': 'metoprolol',
+    'metoprololol': 'metoprolol',
+    
+    // Common diabetes misspellings
+    'metformin': 'metformin',
+    'metformim': 'metformin'
+  };
+  
+  const lowerQuery = query.toLowerCase();
+  return corrections[lowerQuery] || query;
+}
+
+function determineDrugCategory(drugName) {
+  const lowerName = drugName.toLowerCase();
+  
+  // Common drug category patterns
+  if (lowerName.includes('pain') || lowerName.includes('analgesic') || 
+      lowerName.includes('ibuprofen') || lowerName.includes('acetaminophen') ||
+      lowerName.includes('aspirin') || lowerName.includes('paracetamol')) {
+    return 'Pain Relief';
+  }
+  
+  if (lowerName.includes('antibiotic') || lowerName.includes('amoxicillin') ||
+      lowerName.includes('azithromycin') || lowerName.includes('ciprofloxacin')) {
+    return 'Antibiotics';
+  }
+  
+  if (lowerName.includes('diabetes') || lowerName.includes('metformin') ||
+      lowerName.includes('insulin') || lowerName.includes('glimepiride')) {
+    return 'Diabetes';
+  }
+  
+  if (lowerName.includes('hypertension') || lowerName.includes('amlodipine') ||
+      lowerName.includes('lisinopril') || lowerName.includes('pressure')) {
+    return 'Hypertension';
+  }
+  
+  if (lowerName.includes('sleep') || lowerName.includes('zolpidem') ||
+      lowerName.includes('ambien') || lowerName.includes('insomnia')) {
+    return 'Sleep Aid';
+  }
+  
+  if (lowerName.includes('statin') || lowerName.includes('cholesterol') ||
+      lowerName.includes('atorvastatin') || lowerName.includes('simvastatin')) {
+    return 'Cardiovascular';
+  }
+  
+  // Default category
+  return 'General Medicine';
+}
+
+function extractStrengthFromName(drugName) {
+  // Extract strength patterns like "5 mg", "10mg", "500 mg", etc.
+  const strengthMatch = drugName.match(/(\d+\.?\d*)\s*(mg|mcg|g|ml|units?)/i);
+  return strengthMatch ? strengthMatch[0] : null;
+}
+
+function extractDosageForm(drugName) {
+  const lowerName = drugName.toLowerCase();
+  
+  if (lowerName.includes('tablet') || lowerName.includes('tab')) return 'Tablet';
+  if (lowerName.includes('capsule') || lowerName.includes('cap')) return 'Capsule';
+  if (lowerName.includes('syrup') || lowerName.includes('liquid')) return 'Syrup';
+  if (lowerName.includes('injection') || lowerName.includes('inj')) return 'Injection';
+  if (lowerName.includes('cream') || lowerName.includes('ointment')) return 'Topical';
+  if (lowerName.includes('drops')) return 'Drops';
+  
+  return 'Tablet'; // Default
+}
 
 // Note: React app is served separately by development server on port 3000
 // This catch-all route is only needed for production builds

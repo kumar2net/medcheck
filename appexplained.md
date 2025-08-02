@@ -1,7 +1,7 @@
-# 🏥 DrugReco Application Architecture & Data Flow Explanation
+# 🏥 MedicineChk Application Architecture & Data Flow Explanation
 
 ## Overview
-DrugReco is a family medication management system built with React frontend, Express.js backend (migrated to Netlify serverless functions), PostgreSQL database, and Prisma ORM. **Now enhanced with real-time clinical data integration using FDA RxNav APIs and agentic weekly updates.**
+MedicineChk is a family medication management system built with React frontend, Express.js backend (migrated to Netlify serverless functions), PostgreSQL database, and Prisma ORM. **Now enhanced with real-time clinical data integration using FDA RxNav APIs and agentic weekly updates.**
 
 **🆕 UPDATE (July 2025)**: The application now features a production-ready clinical data integration system that replaces dangerous hardcoded interactions with real FDA data and automated safety monitoring.
 
@@ -448,4 +448,4 @@ if (searchQuery.notFound) {
 
 ---
 
-*This document provides a complete technical overview of DrugReco's drug fetching, interaction checking, and agentic AI systems with the new clinical data integration implemented in July 2025.*
+*This document provides a complete technical overview of MedicineChk's drug fetching, interaction checking, and agentic AI systems with the new clinical data integration implemented in July 2025. Updated August 2, 2025.*

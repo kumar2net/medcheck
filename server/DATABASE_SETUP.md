@@ -35,7 +35,7 @@ This project uses PostgreSQL for production-ready database management.
 
 ### Database Information
 
-- **Database Name:** `drugreco_dev`
+- **Database Name:** `medicinechk_dev`
 - **User:** `kumar`
 - **Host:** `localhost`
 - **Port:** `5432`
@@ -53,23 +53,64 @@ The database is seeded with 23 drug records including:
 
 To connect directly to PostgreSQL:
 ```bash
-psql -d drugreco_dev
+psql -d medicinechk_dev
 ```
 
 ### Troubleshooting
 
+#### Common Issue: "Can't reach database server at localhost:5432"
+
+**Problem:** This error occurs when PostgreSQL service is not running.
+
+**Permanent Solution:**
+```bash
+# Start PostgreSQL and enable auto-start
+brew services start postgresql@17
+```
+
+**Quick Fix (if service is stopped):**
+```bash
+# Check service status
+brew services list | grep postgresql
+
+# Start service manually (temporary)
+brew services start postgresql@17
+
+# Verify connection
+cd server && npm run db:migrate
+```
+
+#### Other Issues
+
 If you get "role does not exist" errors, make sure:
 1. PostgreSQL service is running
 2. Your system user has access to PostgreSQL
-3. The database `drugreco_dev` exists
+3. The database `medicinechk_dev` exists
 
 If PostgreSQL commands are not found:
 ```bash
 export PATH="/opt/homebrew/Cellar/postgresql@17/17.5/bin:$PATH"
 ```
 
+#### Auto-Start Configuration
+
+The PostgreSQL service should automatically start on system boot. To verify:
+```bash
+# Check if service is configured to auto-start
+brew services list | grep postgresql@17
+
+# Should show: postgresql@17 started kumar ~/Library/LaunchAgents/homebrew.mxcl.postgresql@17.plist
+```
+
+#### Development Workflow
+
+To prevent database connection issues:
+1. Always use `brew services start postgresql@17` (enables auto-start)
+2. Never use manual `pg_ctl` commands for persistent setup
+3. Check service status if app shows database errors
+
 ---
 
-**Last Updated:** 2025-07-31  
+**Last Updated:** 2025-08-02  
 **PostgreSQL Version:** 17.5 via Homebrew  
-**Status:** Production-ready database setup 
+**Status:** Production-ready database setup with auto-start configured 

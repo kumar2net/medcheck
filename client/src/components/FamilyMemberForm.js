@@ -1,6 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { familyApiService } from '../services/familyApi';
 
+// Helper function to safely parse JSON or treat as array/text
+const safeParseArrayField = (field) => {
+  if (!field) return [];
+  
+  try {
+    const parsed = JSON.parse(field);
+    return Array.isArray(parsed) ? parsed : [parsed];
+  } catch (error) {
+    // If parsing fails, treat as comma-separated text
+    return field.split(/[,;|]/).map(item => item.trim()).filter(item => item.length > 0);
+  }
+};
+
 const FamilyMemberForm = ({ member, onSave, onCancel }) => {
   const [formData, setFormData] = useState({
     name: '',
@@ -23,8 +36,8 @@ const FamilyMemberForm = ({ member, onSave, onCancel }) => {
         name: member.name || '',
         age: member.age || '',
         photo: member.photo || '',
-        allergies: member.allergies ? JSON.parse(member.allergies) : [],
-        conditions: member.conditions ? JSON.parse(member.conditions) : [],
+        allergies: safeParseArrayField(member.allergies),
+        conditions: safeParseArrayField(member.conditions),
         emergencyContact: member.emergencyContact || '',
         emergencyPhone: member.emergencyPhone || '',
         role: member.role || 'member'
